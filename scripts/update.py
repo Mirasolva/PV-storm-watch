@@ -145,6 +145,8 @@ def get_storm():
         'public_advisory_number':(matching.get('publicAdvisory') or {}).get('advNum'),
         'forecast_advisory':forecast_ref.get('url'),
         'forecast_issued':forecast_ref.get('issuance'),
+        'forecast_discussion':(matching.get('forecastDiscussion') or {}).get('url'),
+        'wind_probabilities':(matching.get('windSpeedProbabilities') or {}).get('url'),
         'forecast_graphics':(matching.get('forecastGraphics') or {}).get('url'),
         'track_kmz':(matching.get('forecastTrack') or {}).get('kmzFile'),
         'cone_kmz':(matching.get('trackCone') or {}).get('kmzFile'),
