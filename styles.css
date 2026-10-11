@@ -83,3 +83,4 @@ body{background:radial-gradient(ellipse at 10% 0%,#153644 0,transparent 42rem),#
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 @media(min-width:1081px){.grid-track{grid-template-columns:minmax(0,1.4fr) minmax(340px,1fr)}.map-wrap{height:540px}}
 @media(pointer:coarse){.leaflet-touch .leaflet-bar a{width:44px;height:44px;line-height:44px}.lang-switch button{min-width:44px;min-height:44px}}
+@media(max-width:740px){.video-panel{min-height:310px}.video-caption{bottom:14px;left:16px;right:16px;line-height:1.5}}
