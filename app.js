@@ -166,9 +166,9 @@
     const dist=Math.round(haversine(closest.lat,closest.lon,target.lat,target.lon));
     setText('forecastExplanation',`${t('closest')} ${t('roughDistance')} ${measurement(dist,'distance')} ${unitLabel('distance')} (${localTime(closest.time)}). ${t('forecastCaution')} ${t('forecastIssued')}: ${localTime(s.forecast_issued)}.`);
   }
-  function renderCommunities(){const node=byId('communityGrid');node.innerHTML='';towns.forEach(item=>{const forecast=latest&&latest.communities&&latest.communities[item.key];const modelAge=forecast?(Date.now()-Date.parse(forecast.retrieved_at))/3600000:Infinity;const available=forecast&&Array.isArray(forecast.hourly)&&forecast.hourly.length===24&&Number.isFinite(modelAge)&&modelAge>=-0.25&&modelAge<=1.5&&Date.parse(forecast.period_end)>Date.now();
+  function renderCommunities(){const node=byId('communityGrid');const expanded=new Set([...node.querySelectorAll('details[open]')].map(card=>card.dataset.town));node.innerHTML='';towns.forEach(item=>{const forecast=latest&&latest.communities&&latest.communities[item.key];const modelAge=forecast?(Date.now()-Date.parse(forecast.retrieved_at))/3600000:Infinity;const available=forecast&&Array.isArray(forecast.hourly)&&forecast.hourly.length===24&&Number.isFinite(modelAge)&&modelAge>=-0.25&&modelAge<=1.5&&Date.parse(forecast.period_end)>Date.now();
     const rain=available&&forecast.rain24h_mm!=null?`${measurement(forecast.rain24h_mm,'rain')} ${unitLabel('rain')}`:'--';const wind=available&&forecast.max_wind24h_kmh!=null?`${measurement(forecast.max_wind24h_kmh,'speed')} ${unitLabel('speed')}`:'--';const onset=available?(forecast.rain_window?`${t('rainStart')} ${localTime(new Date(Math.floor(Date.parse(forecast.rain_window)/(3*3600000))*3*3600000).toISOString())} – ${localTime(new Date((Math.floor(Date.parse(forecast.rain_window)/(3*3600000))+1)*3*3600000).toISOString())}`:t('rainUnknown')):t('waiting');
-    const card=document.createElement('article');card.className='community-card';
+    const card=document.createElement('details');card.className='community-card';card.dataset.town=item.key;card.open=expanded.has(item.key);const summary=document.createElement('summary');
     const top=document.createElement('div');top.className='card-eyebrow';top.innerHTML=`<span>${t('modelForecast')}</span><span>${item.number} / 05</span>`;
     const heading=document.createElement('h3');heading.textContent=t(item.name);
     const risk=document.createElement('p');risk.className='risk';risk.textContent=t(item.risk);
@@ -177,7 +177,7 @@
     label=document.createElement('small');label.textContent=t('windMax');val=document.createElement('strong');val.textContent=wind;windFact.append(label,val);facts.append(rainFact,windFact);
     for(const [key,value,unit] of [['gustMax',forecast&&forecast.max_gust24h_kmh,' km/h'],['rainChance',forecast&&forecast.max_rain_probability,'%']]){const fact=document.createElement('div');const l=document.createElement('small');l.textContent=t(key);const v=document.createElement('strong');v.textContent=available&&value!=null?(key==='gustMax'?measurement(value,'speed')+' '+unitLabel('speed'):value+unit):'--';fact.append(l,v);facts.append(fact);}
     const foot=document.createElement('p');foot.className='rain-start';foot.textContent=onset;
-    const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');card.append(top,heading,risk,facts,foot,stamp);node.append(card);
+    const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');const compactRain=document.createElement('strong');compactRain.className='compact-rain';compactRain.textContent=rain;const rainLabel=document.createElement('small');rainLabel.textContent=t('rainModelLabel');compactRain.append(rainLabel);summary.append(heading,risk,compactRain);card.append(summary,top,facts,foot,stamp);node.append(card);
   });}
   function stopCameras(){
     document.querySelectorAll('.camera-player').forEach(node=>{node.replaceChildren();node.hidden=true;});
@@ -215,7 +215,52 @@
     cameras.forEach(c=>{const m=L.marker([c.lat,c.lon],{icon:L.divIcon({className:'cam-map-icon',html:'&#128247;',iconSize:[27,27],iconAnchor:[13,13]})});const wrapper=document.createElement('div');const label=document.createElement('strong');label.textContent=c.name;const link=document.createElement('a');link.href=c.link;link.target='_blank';link.rel='noopener noreferrer';link.textContent=t('viewCamera')+' \u2197';wrapper.append(label,document.createElement('br'),link);m.bindPopup(wrapper);m.addTo(map);mapLayers.push(m);});
     if(positions.length){map.fitBounds(L.latLngBounds(positions).pad(.19),{maxZoom:9,animate:false});}setTimeout(()=>map.invalidateSize(),90);
   }catch(e){byId('mapFallback').hidden=false;console.warn('Map failed:',e);}}
-  function renderAll(){renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();}
+  Object.assign(T.en, {
+    navTrack:'Maps',briefTitle:'Your coast at a glance.',briefIntro:'The storm, your area, and what comes next.',chooseTown:'Your community',nowLabel:'01 / THE STORM NOW',watchLabel:'02 / WHAT TO WATCH',watchHeading:'Rain, surf & access',concernsNote:'Area vulnerabilities, not a confirmed local warning.',nextLabel:'03 / YOUR LOCAL OUTLOOK',officialRain:'See official rainfall outlook ↓',compareTowns:'Compare all communities ↓',stormDetails:'Storm measurements & coordinates',mapCone:'Forecast cone',mapTrack:'Local track',mapSatellite:'Satellite clouds',mapRain:'Rain outlook',mapHeading:'Four ways to see the storm',section01:'MAPS / CHOOSE YOUR VIEW',trackMore:'How to read the track & forecast',coneUnavailable:'Official cone unavailable. Open the NHC map for the latest graphic.',imageLoading:'Loading imagery…',satelliteLoop:'Open NOAA animation ↗',imageFailed:'Imagery could not load. Use the source link to check directly.',
+    explainCone:'Where the center could travel. NOAA’s cone shows forecast uncertainty—not the storm’s size. Impacts can extend outside it. Check the issue time on the image; tap to enlarge.',explainTrack:'Where the forecast center goes relative to our communities. Tap a forecast dot for its time. This line is not a boundary for dangerous weather.',explainSatellite:'What the clouds look like now across the eastern Pacific. NOAA satellite imagery—not a future track or ground-level rain measurement. Check the timestamp on the image.',explainRain:'Where heavier rain is forecast. Official rainfall potential from NOAA/WPC—not live radar. Use the dates and color scale printed on the map; amounts may cover several days. Tap to enlarge.',rainUnavailable:'Official rainfall graphic unavailable. Open the NHC map for the latest forecast.',
+    fromPv:'from Puerto Vallarta’s center',movingBrief:'Moving',rainBrief:'modeled rain / 24 h',noTiming:'No clear heavier-rain period identified by this model.',localModelNote:'Weather model estimate; may understate hurricane impacts.',communitySubtitle:'Compare area concerns and modeled rain. Expand a community for wind, timing and source details.',communitiesHeading:'What to watch in each community',section02:'LOCAL OUTLOOK / COMPARE AREAS',detailsLabel:'Forecast details',safetyText:'Rain, surf and flooding can be dangerous outside the cone. Follow local alerts and evacuation orders.',noActiveBrief:'No active Simon advisory found. This is not a local all-clear.',forecastHeading:'Forecast estimate',rainModelLabel:'24-hour rain estimate',modelCautionShort:'These estimates may understate hurricane rain and wind. Prioritize official local alerts.'
+  });
+  Object.assign(T.es, {
+    navTrack:'Mapas',briefTitle:'Tu costa de un vistazo.',briefIntro:'La tormenta, tu comunidad y lo que viene.',chooseTown:'Tu comunidad',nowLabel:'01 / LA TORMENTA AHORA',watchLabel:'02 / QUÉ VIGILAR',watchHeading:'Lluvia, oleaje y accesos',concernsNote:'Vulnerabilidades de la zona; no es una alerta local confirmada.',nextLabel:'03 / PRONÓSTICO LOCAL',officialRain:'Ver pronóstico oficial de lluvia ↓',compareTowns:'Comparar comunidades ↓',stormDetails:'Mediciones y coordenadas del ciclón',mapCone:'Cono de pronóstico',mapTrack:'Trayectoria local',mapSatellite:'Nubes por satélite',mapRain:'Lluvia prevista',mapHeading:'Cuatro vistas de la tormenta',section01:'MAPAS / ELIGE UNA VISTA',trackMore:'Cómo interpretar la trayectoria y el pronóstico',coneUnavailable:'Cono oficial no disponible. Abre el mapa del NHC para consultar la imagen más reciente.',imageLoading:'Cargando imagen…',satelliteLoop:'Abrir animación de NOAA ↗',imageFailed:'No se pudo cargar la imagen. Consulta el enlace a la fuente.',
+    explainCone:'Por dónde podría pasar el centro. El cono de NOAA muestra incertidumbre, no el tamaño de la tormenta. Puede haber impactos fuera del cono. Revisa la fecha y hora; toca para ampliar.',explainTrack:'La trayectoria prevista del centro respecto a nuestras comunidades. Toca un punto para ver la hora. La línea no delimita el tiempo peligroso.',explainSatellite:'Las nubes actuales sobre el Pacífico oriental. Imagen de NOAA; no es una trayectoria futura ni una medición de lluvia en tierra. Revisa la fecha y hora de la imagen.',explainRain:'Dónde se prevén lluvias más fuertes. Pronóstico oficial de NOAA/WPC; no es radar en vivo. Revisa las fechas y la escala de colores del mapa; las cantidades pueden abarcar varios días. Toca para ampliar.',rainUnavailable:'Imagen de lluvia no disponible. Abre el mapa del NHC para ver el pronóstico más reciente.',
+    fromPv:'del centro de Puerto Vallarta',movingBrief:'Se mueve',rainBrief:'lluvia modelada / 24 h',noTiming:'El modelo no identifica un periodo claro de lluvia más fuerte.',localModelNote:'Estimación de un modelo; puede subestimar los impactos del huracán.',communitySubtitle:'Compara vulnerabilidades y lluvia modelada. Abre una comunidad para ver viento, horarios y fuentes.',communitiesHeading:'Qué vigilar en cada comunidad',section02:'PRONÓSTICO LOCAL / COMPARA ZONAS',detailsLabel:'Detalles del pronóstico',safetyText:'La lluvia, el oleaje y las inundaciones pueden ser peligrosos fuera del cono. Sigue las alertas locales y órdenes de evacuación.',noActiveBrief:'No se encontró un aviso activo de Simon. Esto no significa que no haya peligro local.',forecastHeading:'Estimación del pronóstico',rainModelLabel:'Lluvia estimada en 24 horas',modelCautionShort:'Estas estimaciones pueden subestimar la lluvia y el viento del huracán. Prioriza las alertas locales oficiales.'
+  });
+  let selectedTown='garza',mapView='cone';
+  function modelAvailable(f){const age=f?(Date.now()-Date.parse(f.retrieved_at))/3600000:Infinity;return !!(f&&Array.isArray(f.hourly)&&f.hourly.length===24&&Number.isFinite(age)&&age>=-0.25&&age<=1.5&&Date.parse(f.period_end)>Date.now());}
+  function rainWindowText(f){
+    if(!modelAvailable(f))return t('modelUnavailable');
+    if(!f.rain_window)return t('noTiming');
+    const start=Math.floor(Date.parse(f.rain_window)/(3*3600000))*3*3600000;
+    if(start+3*3600000<=Date.now())return t('noTiming');
+    return t('rainStart')+': '+localTime(new Date(start).toISOString())+' – '+localTime(new Date(start+3*3600000).toISOString(),false)+'.';
+  }
+  function renderBriefing(){
+    const select=byId('townSelect');select.replaceChildren();towns.forEach(town=>{const option=document.createElement('option');option.value=town.key;option.textContent=t(town.name);select.append(option);});select.value=selectedTown;
+    const town=towns.find(x=>x.key===selectedTown),f=latest?.communities?.[selectedTown],s=latest?.storm;
+    setText('localConcerns',t(town.risk));setText('briefTown',t(town.name));
+    setText('briefRain',modelAvailable(f)&&f.rain24h_mm!=null?measurement(f.rain24h_mm,'rain')+' '+unitLabel('rain')+' · '+t('rainBrief'):t('modelUnavailable'));
+    setText('briefWindow',rainWindowText(f));setText('briefForecastStamp',modelAvailable(f)?t('modelRetrieved')+': '+localTime(f.retrieved_at)+'. '+t('localModelNote'):t('localModelNote'));
+    setText('stormDistance',s?.status==='active'?t('roughDistance')+' '+measurement(haversine(s.lat,s.lon,20.6067,-105.235),'distance')+' '+unitLabel('distance')+' '+t('fromPv')+'. '+t('movingBrief')+' '+direction(s.movement_degrees)+' · '+measurement(s.movement_kmh,'speed')+' '+unitLabel('speed')+'.':s?.status==='not_active'?t('noActiveBrief'):t('unavailable'));
+  }
+  function renderMapViews(){
+    document.querySelectorAll('[data-map-view]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mapView===mapView)));
+    ['cone','track','satellite','rain'].forEach(view=>byId(view+'Panel').hidden=view!==mapView);
+    setText('mapExplainer',t(({cone:'explainCone',track:'explainTrack',satellite:'explainSatellite',rain:'explainRain'})[mapView]));
+    document.querySelector('.map-disclaimer').hidden=mapView!=='track';
+    if(mapView==='cone'||mapView==='rain'){
+      const src=latest?.mode==='live'&&latest?.storm?.status==='active'?safeUrl(latest.storm[mapView+'_image_url']):null;
+      const img=byId(mapView+'Image'),unavailable=byId(mapView+'Unavailable'),link=byId(mapView+'ImageLink');
+      if(!src){unavailable.hidden=false;img.hidden=true;img.removeAttribute('src');link.removeAttribute('href');}
+      else if(img.getAttribute('src')!==src){unavailable.hidden=true;img.hidden=true;img.onload=()=>{img.hidden=false;unavailable.hidden=true;};img.onerror=()=>{img.hidden=true;unavailable.hidden=false;};img.src=src;link.href=src;}
+    }
+    if(mapView==='satellite'){
+      const img=byId('satelliteImage'),src='https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/eep/GEOCOLOR/1800x1080.jpg?t='+Math.floor(Date.now()/600000);
+      if(img.getAttribute('src')!==src){img.hidden=true;setText('satelliteUnavailable',t('imageLoading'));byId('satelliteUnavailable').hidden=false;img.onload=()=>{img.hidden=false;byId('satelliteUnavailable').hidden=true;};img.onerror=()=>{img.hidden=true;setText('satelliteUnavailable',t('imageFailed'));byId('satelliteUnavailable').hidden=false;};img.src=src;}
+    }
+    if(mapView==='track'&&map)setTimeout(()=>{map.invalidateSize();renderMap();},0);
+
+  }
+  function renderAll(){renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
   document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
   document.querySelectorAll('[data-units]').forEach(button=>button.addEventListener('click',()=>{
@@ -223,9 +268,12 @@
     try{localStorage.setItem(unitsKey,units);}catch(_){}
     const query=new URLSearchParams(location.search);query.set('units',units);
     try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash);}catch(_){}
-    renderUnits();renderStorm();renderForecast();renderCommunities();
+    renderUnits();renderStorm();renderForecast();renderCommunities();renderBriefing();
   }));
   byId('loadVideo').addEventListener('click',()=>{stopCameras();const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
   byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);shareUrl.searchParams.set('units',units);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
-  refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();},60*1000);
+  byId('rainShortcut').addEventListener('click',()=>{mapView='rain';renderMapViews();});
+  byId('townSelect').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();});
+  document.querySelectorAll('[data-map-view]').forEach(button=>button.addEventListener('click',()=>{mapView=button.dataset.mapView;renderMapViews();}));
+  refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();renderBriefing();},60*1000);
 })();

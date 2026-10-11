@@ -1,12 +1,28 @@
 import unittest
 from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
-from scripts.update import parse_forecast_advisory, latlon, get_storm, get_local_forecast, advisory_matches, main, LOCAL_TZ
+from scripts.update import parse_forecast_advisory, latlon, get_storm, get_local_forecast, advisory_matches, main, LOCAL_TZ, graphic_image_url
 import json
 import tempfile
 from pathlib import Path
 
 class TestNHC(unittest.TestCase):
+    def test_graphic_identity_and_full_size(self):
+        thumb='/storm_graphics/EP20/refresh/EP202026_5day_cone_sm+png/111452_5day_cone_sm.png'
+        full='/storm_graphics/EP20/refresh/EP202026_5day_cone+png/111452_5day_cone.png'
+        html=f'<img src="{thumb}"><img src = "{full}">'
+        self.assertEqual(graphic_image_url(html,'ep202026'),'https://www.nhc.noaa.gov'+full)
+        self.assertIsNone(graphic_image_url(html,'ep192026'))
+        self.assertIsNone(graphic_image_url(f'<img src="https://other.example{full}">','ep202026'))
+        self.assertIsNone(graphic_image_url(f'<img src="{thumb}">','ep202026'))
+
+    def test_rain_graphic_matches_basin_number_and_year(self):
+        image='/storm_graphics/EP20/refresh/EP2026INTQPF+gif/111452INTQPF.gif'
+        html=f'<img src="{image}">'
+        self.assertEqual(graphic_image_url(html,'ep202026','rain'),'https://www.nhc.noaa.gov'+image)
+        self.assertIsNone(graphic_image_url(html,'ep202025','rain'))
+        self.assertIsNone(graphic_image_url(html,'ep192026','rain'))
+
     def test_latlon(self):
         self.assertEqual(latlon('19.5N'),19.5)
         self.assertEqual(latlon('105.4W'),-105.4)

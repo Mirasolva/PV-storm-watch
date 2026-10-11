@@ -96,6 +96,21 @@ def parse_forecast_advisory(raw, issued_at):
         results.append({'lat':latlon(latitude),'lon':latlon(longitude),'time':dt.isoformat().replace('+00:00','Z')})
     return results
 
+def graphic_image_url(html, storm_id, kind='cone'):
+    """Accept full-size official graphics only for this storm, basin and year."""
+    from urllib.parse import urljoin, urlparse
+    identity=storm_id.upper()
+    if not re.fullmatch(r'(?:EP|AL|CP)\d{6}',identity):return None
+    prefix='/storm_graphics/'+identity[:4]+'/'
+    token=identity+'_5day_cone' if kind=='cone' else identity[:2]+identity[4:]+'INTQPF'
+    for value in re.findall(r'(?:src|href)\s*=\s*["\']([^"\']+)', html, re.I):
+        url=urljoin('https://www.nhc.noaa.gov/',unescape(value))
+        parsed=urlparse(url)
+        if parsed.scheme!='https' or parsed.netloc!='www.nhc.noaa.gov':continue
+        if not parsed.path.startswith(prefix) or '_sm' in parsed.path:continue
+        if re.search(r'/'+re.escape(token)+r'(?:\.(?:png|gif)|\+(?:png|gif)/[^/]+\.(?:png|gif))$',parsed.path):return url
+    return None
+
 def get_storm():
     payload=fetch_json(NHC_URL)
     storms=payload.get('activeStorms')
@@ -147,6 +162,16 @@ def get_storm():
             storm['forecast']=forecast
         except (ValueError,urllib.error.URLError,TimeoutError) as e:
             storm['forecast_error']=type(e).__name__
+    from urllib.parse import urlsplit, urlunsplit
+    for kind,query in [('cone','cone'),('rain','rainqpf')]:
+        storm[kind+'_image_url']=None
+        if storm['forecast_graphics']:
+            try:
+                base=urlsplit(storm['forecast_graphics'])
+                page=urlunsplit((base.scheme,base.netloc,base.path,query,''))
+                storm[kind+'_image_url']=graphic_image_url(fetch_text(page),storm['id'],kind)
+            except (ValueError,urllib.error.URLError,TimeoutError):
+                pass  # Missing imagery must never prevent an advisory update.
     return storm
 
 def get_local_forecast(lat,lon):

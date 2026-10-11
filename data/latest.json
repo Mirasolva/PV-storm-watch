@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-11T15:19:46.582664+00:00",
+  "checked_at": "2026-10-11T16:23:09.125622+00:00",
   "mode": "live",
   "storm": {
     "status": "active",
@@ -62,19 +62,14 @@
       }
     ],
     "forecast_error": null,
-    "source": "https://www.nhc.noaa.gov/CurrentStorms.json"
+    "source": "https://www.nhc.noaa.gov/CurrentStorms.json",
+    "cone_image_url": "https://www.nhc.noaa.gov/storm_graphics/EP20/refresh/EP202026_5day_cone+png/111452_5day_cone.png",
+    "rain_image_url": "https://www.nhc.noaa.gov/storm_graphics/EP20/refresh/EP2026INTQPF+gif/111452INTQPF.gif"
   },
   "communities": {
     "garza": {
-      "retrieved_at": "2026-10-11T15:19:47.805865+00:00",
+      "retrieved_at": "2026-10-11T16:23:10.972851+00:00",
       "hourly": [
-        {
-          "time": "2026-10-11T09:00:00-06:00",
-          "rain_mm": 0.7,
-          "rain_probability": 94.0,
-          "wind_kmh": 2.5,
-          "gust_kmh": 8.3
-        },
         {
           "time": "2026-10-11T10:00:00-06:00",
           "rain_mm": 0.5,
@@ -235,26 +230,26 @@
           "rain_probability": 36.0,
           "wind_kmh": 0.9,
           "gust_kmh": 6.8
+        },
+        {
+          "time": "2026-10-12T09:00:00-06:00",
+          "rain_mm": 0.0,
+          "rain_probability": 35.0,
+          "wind_kmh": 1.0,
+          "gust_kmh": 5.4
         }
       ],
-      "period_start": "2026-10-11T09:00:00-06:00",
-      "period_end": "2026-10-12T09:00:00-06:00",
-      "rain24h_mm": 8.4,
+      "period_start": "2026-10-11T10:00:00-06:00",
+      "period_end": "2026-10-12T10:00:00-06:00",
+      "rain24h_mm": 7.7,
       "max_wind24h_kmh": 5,
       "max_gust24h_kmh": 12,
       "max_rain_probability": 96,
       "rain_window": "2026-10-11T15:00:00-06:00"
     },
     "mismaloya": {
-      "retrieved_at": "2026-10-11T15:19:48.686305+00:00",
+      "retrieved_at": "2026-10-11T16:23:12.094374+00:00",
       "hourly": [
-        {
-          "time": "2026-10-11T09:00:00-06:00",
-          "rain_mm": 0.7,
-          "rain_probability": 94.0,
-          "wind_kmh": 2.5,
-          "gust_kmh": 8.3
-        },
         {
           "time": "2026-10-11T10:00:00-06:00",
           "rain_mm": 0.5,
@@ -415,26 +410,26 @@
           "rain_probability": 36.0,
           "wind_kmh": 0.9,
           "gust_kmh": 6.8
+        },
+        {
+          "time": "2026-10-12T09:00:00-06:00",
+          "rain_mm": 0.0,
+          "rain_probability": 35.0,
+          "wind_kmh": 1.0,
+          "gust_kmh": 5.4
         }
       ],
-      "period_start": "2026-10-11T09:00:00-06:00",
-      "period_end": "2026-10-12T09:00:00-06:00",
-      "rain24h_mm": 8.4,
+      "period_start": "2026-10-11T10:00:00-06:00",
+      "period_end": "2026-10-12T10:00:00-06:00",
+      "rain24h_mm": 7.7,
       "max_wind24h_kmh": 5,
       "max_gust24h_kmh": 12,
       "max_rain_probability": 96,
       "rain_window": "2026-10-11T15:00:00-06:00"
     },
     "boca": {
-      "retrieved_at": "2026-10-11T15:19:49.600748+00:00",
+      "retrieved_at": "2026-10-11T16:23:13.259540+00:00",
       "hourly": [
-        {
-          "time": "2026-10-11T09:00:00-06:00",
-          "rain_mm": 1.0,
-          "rain_probability": 94.0,
-          "wind_kmh": 2.2,
-          "gust_kmh": 7.6
-        },
         {
           "time": "2026-10-11T10:00:00-06:00",
           "rain_mm": 0.6,
@@ -595,26 +590,26 @@
           "rain_probability": 36.0,
           "wind_kmh": 0.4,
           "gust_kmh": 8.6
+        },
+        {
+          "time": "2026-10-12T09:00:00-06:00",
+          "rain_mm": 0.0,
+          "rain_probability": 35.0,
+          "wind_kmh": 2.0,
+          "gust_kmh": 7.2
         }
       ],
-      "period_start": "2026-10-11T09:00:00-06:00",
-      "period_end": "2026-10-12T09:00:00-06:00",
-      "rain24h_mm": 13.2,
+      "period_start": "2026-10-11T10:00:00-06:00",
+      "period_end": "2026-10-12T10:00:00-06:00",
+      "rain24h_mm": 12.2,
       "max_wind24h_kmh": 6,
       "max_gust24h_kmh": 19,
       "max_rain_probability": 96,
-      "rain_window": "2026-10-11T09:00:00-06:00"
+      "rain_window": "2026-10-11T13:00:00-06:00"
     },
     "juntas": {
-      "retrieved_at": "2026-10-11T15:19:50.463411+00:00",
+      "retrieved_at": "2026-10-11T16:23:14.363157+00:00",
       "hourly": [
-        {
-          "time": "2026-10-11T09:00:00-06:00",
-          "rain_mm": 1.0,
-          "rain_probability": 94.0,
-          "wind_kmh": 2.2,
-          "gust_kmh": 7.6
-        },
         {
           "time": "2026-10-11T10:00:00-06:00",
           "rain_mm": 0.6,
@@ -775,26 +770,26 @@
           "rain_probability": 36.0,
           "wind_kmh": 0.4,
           "gust_kmh": 8.6
+        },
+        {
+          "time": "2026-10-12T09:00:00-06:00",
+          "rain_mm": 0.0,
+          "rain_probability": 35.0,
+          "wind_kmh": 2.0,
+          "gust_kmh": 7.2
         }
       ],
-      "period_start": "2026-10-11T09:00:00-06:00",
-      "period_end": "2026-10-12T09:00:00-06:00",
-      "rain24h_mm": 13.2,
+      "period_start": "2026-10-11T10:00:00-06:00",
+      "period_end": "2026-10-12T10:00:00-06:00",
+      "rain24h_mm": 12.2,
       "max_wind24h_kmh": 6,
       "max_gust24h_kmh": 19,
       "max_rain_probability": 96,
-      "rain_window": "2026-10-11T09:00:00-06:00"
+      "rain_window": "2026-10-11T13:00:00-06:00"
     },
     "pv": {
-      "retrieved_at": "2026-10-11T15:19:51.374495+00:00",
+      "retrieved_at": "2026-10-11T16:23:15.492672+00:00",
       "hourly": [
-        {
-          "time": "2026-10-11T09:00:00-06:00",
-          "rain_mm": 0.0,
-          "rain_probability": 75.0,
-          "wind_kmh": 2.4,
-          "gust_kmh": 7.2
-        },
         {
           "time": "2026-10-11T10:00:00-06:00",
           "rain_mm": 0.0,
@@ -955,10 +950,17 @@
           "rain_probability": 38.0,
           "wind_kmh": 2.0,
           "gust_kmh": 10.4
+        },
+        {
+          "time": "2026-10-12T09:00:00-06:00",
+          "rain_mm": 0.0,
+          "rain_probability": 37.0,
+          "wind_kmh": 3.1,
+          "gust_kmh": 9.0
         }
       ],
-      "period_start": "2026-10-11T09:00:00-06:00",
-      "period_end": "2026-10-12T09:00:00-06:00",
+      "period_start": "2026-10-11T10:00:00-06:00",
+      "period_end": "2026-10-12T10:00:00-06:00",
       "rain24h_mm": 7.4,
       "max_wind24h_kmh": 6,
       "max_gust24h_kmh": 19,
