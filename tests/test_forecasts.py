@@ -30,3 +30,12 @@ class Forecasts(unittest.TestCase):
         for issued in [now-timedelta(hours=10),now+timedelta(hours=1)]:
             with self.assertRaises(ValueError):current(issued,9)
 if __name__=='__main__':unittest.main()
+
+class MapIdentity(unittest.TestCase):
+    @patch('scripts.forecasts.current')
+    def test_smn_map_rejects_other_storm_and_missing_date(self,_):
+        from scripts.forecasts import parse_smn_track
+        raw='Sistema ciclónico: Simon Emisión: 2026-10-11 09:00 horas <img src="./WebImg/ImgTray123.jpg">'
+        self.assertIn('ImgTray123.jpg',parse_smn_track(raw,'Simon')['url'])
+        for text in [raw.replace('Simon','Rachel'),raw.replace('Emisión:','Date:'),raw.replace('./WebImg/','https://other.example/')]:
+            with self.assertRaises(ValueError):parse_smn_track(text,'Simon')

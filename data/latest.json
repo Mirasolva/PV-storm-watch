@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-10-11T18:29:45.926335+00:00",
+  "checked_at": "2026-10-11T18:35:10.619638+00:00",
   "mode": "live",
   "storm": {
     "status": "active",
@@ -83,7 +83,7 @@
   },
   "communities": {
     "garza": {
-      "retrieved_at": "2026-10-11T18:29:48.315964+00:00",
+      "retrieved_at": "2026-10-11T18:35:13.396480+00:00",
       "hourly": [
         {
           "time": "2026-10-11T12:00:00-06:00",
@@ -263,7 +263,7 @@
       "rain_window": "2026-10-11T15:00:00-06:00"
     },
     "mismaloya": {
-      "retrieved_at": "2026-10-11T18:29:49.419919+00:00",
+      "retrieved_at": "2026-10-11T18:35:14.515197+00:00",
       "hourly": [
         {
           "time": "2026-10-11T12:00:00-06:00",
@@ -443,7 +443,7 @@
       "rain_window": "2026-10-11T15:00:00-06:00"
     },
     "boca": {
-      "retrieved_at": "2026-10-11T18:29:50.531516+00:00",
+      "retrieved_at": "2026-10-11T18:35:15.626002+00:00",
       "hourly": [
         {
           "time": "2026-10-11T12:00:00-06:00",
@@ -623,7 +623,7 @@
       "rain_window": "2026-10-11T13:00:00-06:00"
     },
     "juntas": {
-      "retrieved_at": "2026-10-11T18:29:51.658416+00:00",
+      "retrieved_at": "2026-10-11T18:35:16.718771+00:00",
       "hourly": [
         {
           "time": "2026-10-11T12:00:00-06:00",
@@ -803,7 +803,7 @@
       "rain_window": "2026-10-11T13:00:00-06:00"
     },
     "pv": {
-      "retrieved_at": "2026-10-11T18:29:52.732888+00:00",
+      "retrieved_at": "2026-10-11T18:35:17.877828+00:00",
       "hourly": [
         {
           "time": "2026-10-11T12:00:00-06:00",
@@ -997,5 +997,10 @@
     "coast": "Oleaje de 8.0 a 10.0 metros de altura: costas de Jalisco, disminuyendo durante el día. Marea de tormenta de 1.5 a 2.5 metros de altura: costas de Jalisco y Colima.",
     "details": "En el transcurso del día, cielo nublado con lluvias puntuales extraordinarias en Jalisco (costa, este y oeste); puntuales torrenciales en Colima; y puntuales intensas en Nayarit (sur); y puntuales muy fuertes en Michoacán (oeste), mismas que podrían originar el incremento en los niveles de ríos y arroyos, deslaves, inundaciones, encharcamientos y visibilidad reducida. Todas las lluvias con descargas eléctricas. Por la mañana, ambiente fresco a templado. Durante la tarde, ambiente templado a cálido. Viento de dirección variable de 210 a 230 km/h con rachas de 240 a 250 km/h en la costa de Jalisco, disminuyendo durante el día; viento de 100 a 120 km/h con rachas de 130 a 140 km/h en las costas de Nayarit y Colima, disminuyendo durante el día; viento de 50 a 70 km/h con rachas de 80 a 90 km/h en las costas de Michoacán. Oleaje de 8.0 a 10.0 metros de altura en las costas de Jalisco, disminuyendo durante el día; oleaje de 6.0 a 8.0 metros de altura en las costas de Colima, disminuyendo durante el día; y oleaje de 4.0 a 6.0 metros de altura en las costas de Nayarit. Asimismo, se prevé marea de tormenta de 1.5 a 2.5 metros de altura en las costas de Jalisco y Colima.",
     "warnings": null
+  },
+  "source_maps": {
+    "checked_at": "2026-10-11T18:35:10.619638+00:00",
+    "smn_track": null,
+    "smn_satellite": "https://smn.conagua.gob.mx/tools/RESOURCES/GOES/GOES%20Este/Centro%20Occidente/Tope%20de%20Nubes/MEDIA/202610111821.jpg"
   }
 }

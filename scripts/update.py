@@ -6,9 +6,9 @@ Runs at GitHub Actions build time. Uses only Python standard library.
 """
 import json
 try:
-    from scripts.forecasts import parse_nhc, parse_smn, SMN_URL
+    from scripts.forecasts import parse_nhc, parse_smn, SMN_URL, SMN_MAP_URL, parse_smn_track
 except ModuleNotFoundError:
-    from forecasts import parse_nhc, parse_smn, SMN_URL
+    from forecasts import parse_nhc, parse_smn, SMN_URL, SMN_MAP_URL, parse_smn_track
 import math
 import re
 import urllib.error
@@ -39,7 +39,7 @@ def fetch_json(url):
         return json.loads(response.read().decode('utf-8'))
 
 def fetch_text(url):
-    if not (url.startswith('https://www.nhc.noaa.gov/') or url == SMN_URL):
+    if not (url.startswith('https://www.nhc.noaa.gov/') or url in (SMN_URL,SMN_MAP_URL) or url.startswith('https://smn.conagua.gob.mx/tools/PHP/Imagen_Satelite_Ultimas.php?')):
         raise ValueError('Unexpected URL authority')
     req = urllib.request.Request(url, headers={'User-Agent':USER_AGENT,'Accept':'text/html,text/plain'})
     with urllib.request.urlopen(req,timeout=20) as response:
@@ -232,6 +232,18 @@ def main():
     except Exception as e:
         result['smn']={'status':'unavailable','source':SMN_URL}
         result['errors'].append('SMN bulletin unavailable: '+type(e).__name__)
+    result['source_maps']={'checked_at':result['checked_at'],'smn_track':None,'smn_satellite':None}
+    try:
+        if result['storm'] and result['storm'].get('status')=='active':
+            result['source_maps']['smn_track']=parse_smn_track(fetch_text(SMN_MAP_URL),result['storm']['name'])
+    except Exception:pass
+    try:
+        from urllib.parse import urlencode, quote
+        query=urlencode({k:quote(v) for k,v in {'satelite':'GOES Este','nombre':'Centro Occidente','tipo':'Tope de Nubes'}.items()})
+        path=fetch_text('https://smn.conagua.gob.mx/tools/PHP/Imagen_Satelite_Ultimas.php?'+query).strip()
+        if re.fullmatch(r'/tools/RESOURCES/GOES/GOES%20Este/Centro%20Occidente/Tope%20de%20Nubes/MEDIA/\d{12}\.jpg',path):
+            result['source_maps']['smn_satellite']='https://smn.conagua.gob.mx'+path
+    except Exception:pass
     for key,name,lat,lon in COMMUNITIES:
         try:result['communities'][key]=get_local_forecast(lat,lon)
         except Exception as e:

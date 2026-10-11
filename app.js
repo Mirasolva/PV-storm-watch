@@ -336,6 +336,26 @@
     setText('comparisonNote',say('How to compare: NHC describes the storm and regional hazards; SMN gives the Jalisco regional forecast; Open-Meteo estimates one town over 24 hours. Differences in totals or wind speeds are not necessarily disagreement. Regional maxima are not predictions for every address. Relative words such as “today” refer to each bulletin’s issue date. Official excerpts retain their original language and units.','Cómo comparar: el NHC describe el ciclón y peligros regionales; el SMN pronostica para Jalisco; Open-Meteo estima una comunidad durante 24 horas. Las diferencias no necesariamente son desacuerdos. Los máximos regionales no son valores para cada domicilio. “Hoy” se refiere a la fecha del aviso. Los extractos conservan el idioma y unidades originales.'));
   }
 
+  let sourceMapView='track';
+  function renderSourceMaps(){
+    const es=lang==='es',say=(a,b)=>es?b:a,root=byId('sourceMapGrid');root.replaceChildren();
+    setText('sourceMapsTitle',say('Compare maps by source','Compara mapas por fuente'));
+    document.querySelectorAll('[data-source-view]').forEach(b=>{b.setAttribute('aria-pressed',String(b.dataset.sourceView===sourceMapView));b.textContent=b.dataset.sourceView==='track'?say('Forecast tracks','Trayectorias previstas'):say('Satellite views','Vistas de satélite');});
+    const m=latest?.source_maps,s=latest?.storm,age=(Date.now()-Date.parse(m?.checked_at))/3600000,valid=latest?.mode==='live'&&age>=-0.25&&age<1.5;
+    const sat=sourceMapView==='satellite';
+    setText('sourceMapsNote',sat?say('Satellite views show observed clouds, not future tracks. These providers may use the same GOES satellite data with different coverage and processing. Read each image’s timestamp; UTC is six hours ahead of Puerto Vallarta.','Las imágenes muestran nubes observadas, no trayectorias futuras. Ambos proveedores pueden usar datos GOES con distinta cobertura y procesamiento. Revisa la hora de cada imagen; UTC está seis horas adelante de Puerto Vallarta.'):say('Compare the official maps and their issue times. Different agencies may share guidance; these are not necessarily independent predictions. CONAGUA maps appear only when the bulletin matches this storm.','Compara mapas oficiales y horas de emisión. Las agencias pueden compartir información; no son necesariamente predicciones independientes. Solo mostramos un mapa de CONAGUA si el aviso corresponde a este ciclón.'));
+    const track=m?.smn_track,trackAge=(Date.now()-Date.parse(track?.issued_at))/3600000;
+    const entries=sat?[
+      ['NOAA / GOES',say('Eastern Pacific · GeoColor','Pacífico oriental · GeoColor'),'https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/eep/GEOCOLOR/1800x1080.jpg?t='+Math.floor(Date.now()/600000)],
+      ['CONAGUA / SMN',say('West-central Mexico · Cloud-top imagery','Centro Occidente · Tope de nubes'),valid?m.smn_satellite:null]
+    ]:[
+      ['NOAA / NHC',say('Official forecast cone · ','Cono oficial · ')+localTime(s?.forecast_issued),s?.status==='active'&&latest?.mode==='live'&&(Date.now()-Date.parse(s.forecast_issued))/3600000<9?safeUrl(s.cone_image_url):null],
+      ['CONAGUA / SMN',say('Official forecast track','Trayectoria oficial')+(track?' · '+localTime(track.issued_at):''),valid&&track?.storm?.toLowerCase()===s?.name?.toLowerCase()&&trackAge>=-0.25&&trackAge<=9?track.url:null]
+    ];
+    entries.forEach(([name,caption,url],i)=>{const a=document.createElement('article');a.className='source-forecast';const h=document.createElement('h3');h.textContent=name;const p=document.createElement('p');p.textContent=caption;a.append(h,p);const status=document.createElement('p');status.className='map-load-status';status.textContent=url?say('Loading official image…','Cargando imagen oficial…'):(!sat&&i===1?say('No current CONAGUA track verified for this storm. Its map page currently may show another cyclone; that track is not substituted here.','No hay trayectoria actual de CONAGUA verificada para este ciclón. Su página puede mostrar otro sistema; no lo sustituimos aquí.'):say('Current image unavailable.','Imagen actual no disponible.'));a.append(status);
+      if(url){const image=document.createElement('img');image.alt=name+' · '+caption;image.hidden=true;image.onload=()=>{image.hidden=false;status.hidden=true;};image.onerror=()=>{image.hidden=true;status.hidden=false;status.textContent=say('Image could not be loaded. Try again later.','No se pudo cargar la imagen. Inténtalo más tarde.');};image.src=url;a.append(image);const d=document.createElement('details');const sum=document.createElement('summary');sum.textContent=say('Enlarge on this page','Ampliar en esta página');d.append(sum);d.addEventListener('toggle',()=>{a.classList.toggle('expanded-map',d.open);});a.append(d);}root.append(a);});
+  }
+
   function renderTheme(){
     const dark=document.documentElement.dataset.theme==='dark';
     const label=lang==='es'?(dark?'☀ Modo claro':'☾ Modo oscuro'):(dark?'☀ Light mode':'☾ Dark mode');
@@ -343,7 +363,7 @@
     byId('themeToggle').setAttribute('aria-label',lang==='es'?'Cambiar a '+(dark?'modo claro':'modo oscuro'):'Switch to '+(dark?'light':'dark')+' mode');
     document.querySelector('meta[name="theme-color"]').content=dark?'#08090b':'#f1f4f2';
   }
-  function renderAll(){renderQuestions();renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();renderComparison();}
+  function renderAll(){renderSourceMaps();renderQuestions();renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();renderComparison();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
   document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
   document.querySelectorAll('[data-units]').forEach(button=>button.addEventListener('click',()=>{
@@ -361,5 +381,6 @@
   byId('townSelect').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();renderComparison();renderForecast();});
   document.querySelectorAll('[data-map-view]').forEach(button=>button.addEventListener('click',()=>{mapView=button.dataset.mapView;renderMapViews();}));
   byId('themeToggle').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem('bahia-watch-theme',theme);}catch(_){}renderTheme();});
+  document.querySelectorAll('[data-source-view]').forEach(b=>b.addEventListener('click',()=>{sourceMapView=b.dataset.sourceView;renderSourceMaps();}));
   refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();renderBriefing();renderResearch();renderComparison();},60*1000);
 })();

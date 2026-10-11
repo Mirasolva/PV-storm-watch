@@ -72,3 +72,15 @@ def parse_smn(raw):
     return {'status':'available','issued_at':issued.isoformat(),'source':SMN_URL,'language':'es',
         'timing':timing,'rain':' '.join(rains),'wind':' '.join(winds),'coast':' '.join(coast),
         'details':clean(region.group(1)), 'warnings':None}
+
+SMN_MAP_URL='https://smn.conagua.gob.mx/tools/GUI/PortalLaravel/public/WebAviso'
+def parse_smn_track(raw,storm_name):
+    text=clean(plain(raw))
+    identity=re.search(r'Sistema ciclónico:\s*([\wÁÉÍÓÚáéíóú]+)',text)
+    if not identity or identity.group(1).casefold()!=storm_name.casefold():raise ValueError('Different storm on SMN map page')
+    stamp=re.search(r'Emisión:\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) horas',text)
+    if not stamp:raise ValueError('Missing map issue time')
+    issued=datetime.strptime(stamp.group(1),'%Y-%m-%d %H:%M').replace(tzinfo=ZoneInfo('America/Mexico_City'));current(issued,9)
+    image=re.search(r'''src=["']\./WebImg/(ImgTray\d+\.(?:jpg|png))["']''',raw)
+    if not image:raise ValueError('Missing official track image')
+    return {'url':SMN_MAP_URL.rsplit('/',1)[0]+'/WebImg/'+image.group(1),'issued_at':issued.isoformat(),'storm':identity.group(1)}
