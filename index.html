@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#081c2a">
+  <meta name="description" content="Bahia Storm Watch: bilingual official hurricane track, local forecast estimates, and Banderas Bay webcam links.">
+  <title>Bahia Storm Watch | Monitor de Tormentas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <div class="shell">
+    <header class="site-header">
+      <a href="#top" class="brand" aria-label="Bahia Storm Watch home"><span class="brand-mark">&#127744;</span><span class="brand-copy"><strong>BAHIA<span class="brand-dot">.</span></strong><small>STORM WATCH</small></span></a>
+      <nav class="nav-links" aria-label="Main navigation">
+        <a href="#track" data-i18n="navTrack">Storm track</a>
+        <a href="#communities" data-i18n="navCommunities">Communities</a>
+        <a href="#cameras" data-i18n="navCameras">Live cameras</a>
+      </nav>
+      <div class="header-actions">
+        <div class="lang-switch" role="group" aria-label="Language"><button type="button" data-lang="en" aria-pressed="true">EN</button><button type="button" data-lang="es" aria-pressed="false">ES</button></div>
+        <button class="btn btn-share" id="shareButton" type="button"><span aria-hidden="true">&#8599;</span><span data-i18n="share">Share</span></button>
+      </div>
+    </header>
+
+    <main id="top">
+      <div class="notice-rail"><span class="notice-pulse"></span><span id="freshLabel">CHECKING OFFICIAL DATA</span><span class="notice-separator"></span><span id="lastUpdated">--</span><a id="topNHCLink" href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer"><span data-i18n="nhcLink">NHC advisory</span> <span aria-hidden="true">&#8599;</span></a></div>
+      <p id="dataWarning" class="data-warning" role="status" hidden></p>
+      <section class="hero">
+        <div class="hero-glow"></div>
+        <div class="hero-copy">
+          <div class="eyebrow"><span class="eyebrow-line"></span><span data-i18n="eyebrow">PUERTO VALLARTA & BANDERAS BAY</span></div>
+          <h1><span data-i18n="heroTitle1">Know the storm.</span><br><em data-i18n="heroTitle2">Know your coast.</em></h1>
+          <p class="hero-description" data-i18n="heroDescription">Official hurricane positions from NOAA, local weather-model estimates, and cameras along the bay in one place.</p>
+          <div class="hero-buttons"><a class="btn btn-primary" href="#track"><span data-i18n="viewTrack">Explore track</span><span>&#8599;</span></a><a class="btn btn-ghost" href="#cameras"><span data-i18n="viewCameras">View webcams</span><span>&#8600;</span></a></div>
+        </div>
+        <div class="hero-aside"><span class="hero-aside-label" data-i18n="currentSituation">CURRENT SITUATION</span><div class="storm-name" id="stormName">SIMON</div><div class="storm-category" id="categoryText">--</div><div class="storm-location" id="stormLocation">--</div><div class="hero-aside-divider"></div><div class="aside-timestamp"><span data-i18n="officialObservation">Official observation</span><strong id="advisoryTime">--</strong></div></div>
+      </section>
+
+      <div class="safety-banner" role="note"><span class="safety-symbol">!</span><p><strong data-i18n="safetyTitle">Important:</strong> <span data-i18n="safetyText">A hurricane center does not have to cross your location to cause dangerous rain, surf, floods, or landslides. Follow official alerts and evacuation orders.</span></p><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer"><span data-i18n="officialAlerts">Official alerts</span> &#8599;</a></div>
+
+      <section class="metrics" aria-label="Current storm facts">
+        <article class="metric"><div class="metric-top"><span data-i18n="metricMove">MOVING</span><span class="metric-icon">&#8599;</span></div><div class="metric-value"><strong id="metricSpeed">--</strong><span data-i18n="kmh">km/h</span></div><p id="metricDirection">--</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricWind">CORE WINDS</span><span class="metric-icon">~</span></div><div class="metric-value"><strong id="metricWindValue">--</strong><span>km/h</span></div><p data-i18n="coreWarning">At storm center, not your town</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricPressure">PRESSURE</span><span class="metric-icon">&#9678;</span></div><div class="metric-value"><strong id="metricPressureValue">--</strong><span>mb</span></div><p data-i18n="centralPressure">Minimum central pressure</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricCoordinates">CURRENT CENTER</span><span class="metric-icon">+</span></div><div class="metric-value metric-coordinates"><strong id="metricCoordinatesValue">--</strong></div><p data-i18n="coordinatesNote">Official center coordinates</p></article>
+      </section>
+
+      <section class="section grid-track" id="track">
+        <div class="map-column"><div class="section-heading"><div><span class="section-kicker" data-i18n="section01">01 / STORM TRAJECTORY</span><h2 data-i18n="mapHeading">Where is the eye headed?</h2></div><a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer" class="text-link" id="officialMapLink" data-i18n="openNOAA">Open official NHC map &#8599;</a></div><div class="map-wrap"><div id="map"></div><div id="mapFallback" class="map-fallback" hidden><p data-i18n="mapUnavailable">Interactive map unavailable. Use the official NOAA forecast map.</p><a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer" data-i18n="openNOAA">Open official NHC map</a></div><div class="map-legend"><span><i class="legend-dot dot-current"></i><span data-i18n="currentEye">Latest center</span></span><span><i class="legend-line"></i><span data-i18n="forecastEye">Forecast center</span></span><span><i class="legend-dot dot-community"></i><span data-i18n="townPin">Communities</span></span></div></div><p class="map-disclaimer" data-i18n="mapFootnote">Dots and line represent forecast center positions, not the boundaries of wind or rain. Forecast points are not interpolated. Always review the official NHC cone of uncertainty.</p></div>
+        <aside class="track-summary"><span class="section-kicker" data-i18n="trackInterpretation">FORECAST INTERPRETATION</span><h3 data-i18n="centerNotImpact">The eye's path is not the same as the storm's impact.</h3><div class="summary-item"><span class="summary-no">01</span><div><strong data-i18n="forecastPositions">Official forecast points</strong><p id="forecastExplanation" data-i18n="forecastLoading">Loading NHC forecast positions...</p></div></div><div class="summary-item"><span class="summary-no">02</span><div><strong data-i18n="arrivalLimit">Arrival-time limitation</strong><p data-i18n="arrivalCaveat">Neighborhood rain estimates are model-based. They are not predictions that the hurricane eye will arrive in every community.</p></div></div><div class="summary-item"><span class="summary-no">03</span><div><strong data-i18n="certaintyTitle">What remains uncertain</strong><p data-i18n="certaintyText">Small changes in the track can change local risk significantly. Rainbands and gusts can arrive ahead of the center.</p></div></div><div class="track-actions"><a id="forecastSourceLink" href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><span data-i18n="readForecast">Read official forecast</span> <span>&#8599;</span></a></div></aside>
+      </section>
+
+      <section class="section communities-section" id="communities"><div class="section-heading"><div><span class="section-kicker" data-i18n="section02">02 / LOCAL IMPACTS</span><h2 data-i18n="communitiesHeading">Your coast, community by community.</h2><p data-i18n="communitySubtitle">Model forecasts for rain and wind. Distinct from the official NHC forecast of the eye's location.</p></div></div><div class="community-grid" id="communityGrid"></div><div class="model-note"><span class="model-note-icon">i</span><span data-i18n="modelDisclosure">Open-Meteo estimates may substantially underpredict hurricane winds or localized intense rainfall. Numbers are not observations or guarantees. For safety decisions, prioritize NHC, CONAGUA and Proteccion Civil.</span></div></section>
+
+      <section class="section cameras-section" id="cameras"><div class="section-heading"><div><span class="section-kicker" data-i18n="section03">03 / EYES ON THE COAST</span><h2 data-i18n="camerasHeading">Live camera directory</h2><p data-i18n="cameraSubtitle">Public camera links to observe conditions. A labeled camera may be temporarily offline; always verify its playback timestamp.</p></div><span class="video-tag" data-i18n="videoCaution">NOT WEATHER INSTRUMENTS</span></div><div class="featured-video"><div class="video-panel"><div class="video-poster" id="videoPoster"><span class="video-wave">&#8779;</span><span class="video-place">LOS MUERTOS<br>PIER CAM</span><button type="button" class="video-play" id="loadVideo" aria-label="Load YouTube video">&#9654;</button><div class="video-caption" data-i18n="clickToLoad">Tap play to load El Dorado's YouTube stream</div></div><div id="embedContainer" hidden></div></div><div class="featured-copy"><span class="camera-featured-label" data-i18n="featuredCamera">FEATURED CAMERA / VERIFIED LOCATION</span><h3>El Dorado <em>Restaurant</em></h3><p class="cam-address"><span>&#8982;</span><span data-i18n="elDoradoLocation">Los Muertos Beach, next to the pier, Puerto Vallarta</span></p><p data-i18n="elDoradoDescription">Beachfront view toward the Los Muertos Pier and Banderas Bay. Camera operated by El Dorado Restaurant.</p><div class="camera-links"><a class="btn btn-primary" href="https://www.youtube.com/live/ac5AU4B10ak" target="_blank" rel="noopener noreferrer"><span data-i18n="watchOnYoutube">Watch on YouTube</span> &#8599;</a><a class="btn btn-outline" href="https://www.eldoradopvr.com/live-stream" target="_blank" rel="noopener noreferrer"><span data-i18n="officialCameraPage">Official camera page</span> &#8599;</a></div></div></div><div class="camera-grid" id="cameraGrid"></div></section>
+
+      <section class="section sources-section" id="sources"><div class="section-heading"><div><span class="section-kicker" data-i18n="section04">04 / TRUSTED INFORMATION</span><h2 data-i18n="sourcesHeading">Go to the source.</h2><p data-i18n="sourcesIntro">NHC storm and Open-Meteo model data are retrieved automatically. Mexican authorities are linked directly for official local bulletins and evacuation notices, which are not automatically verified by this site.</p></div></div><div class="source-grid"><a href="https://www.nhc.noaa.gov/" class="source-item" target="_blank" rel="noopener noreferrer"><span class="source-icon">N</span><div><strong>NOAA / NHC</strong><p data-i18n="sourceNHC">Official track, coordinates, intensity and warnings</p><small data-i18n="automatic">AUTOMATIC DATA</small></div><b>&#8599;</b></a><a href="https://smn.conagua.gob.mx/" class="source-item" target="_blank" rel="noopener noreferrer"><span class="source-icon">C</span><div><strong>CONAGUA / SMN</strong><p data-i18n="sourceSMN">Mexican rainfall and marine advisories</p><small data-i18n="directLink">DIRECT OFFICIAL LINK</small></div><b>&#8599;</b></a><a href="https://proteccioncivil.jalisco.gob.mx/" class="source-item" target="_blank" rel="noopener noreferrer"><span class="source-icon">J</span><div><strong>Proteccion Civil Jalisco</strong><p data-i18n="sourcePC">Local evacuation, shelter and emergency information</p><small data-i18n="directLink">DIRECT OFFICIAL LINK</small></div><b>&#8599;</b></a><a href="https://open-meteo.com/" class="source-item" target="_blank" rel="noopener noreferrer"><span class="source-icon">M</span><div><strong>Open-Meteo</strong><p data-i18n="sourceModel">Supplemental hourly neighborhood weather models</p><small data-i18n="automatic">AUTOMATIC DATA</small></div><b>&#8599;</b></a></div></section>
+    </main>
+    <p class="model-attribution"><a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" data-i18n="modelLicense">Weather data: Open-Meteo (CC BY 4.0). Hourly data summarized into 24-hour totals and peaks.</a> · <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer">CC BY 4.0</a></p>
+    <footer><div><span class="footer-brand">BAHIA<span>.</span> STORM WATCH</span><p data-i18n="footerInfo">Free community dashboard. Not an official warning system. Do not use it as your sole source for life-safety decisions.</p></div><div class="footer-right"><a href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer">NHC</a><a href="https://smn.conagua.gob.mx/" target="_blank" rel="noopener noreferrer">CONAGUA</a><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer">Proteccion Civil</a><span>2026</span></div></footer>
+  </div>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

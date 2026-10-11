@@ -1,0 +1,179 @@
+(function () {
+  'use strict';
+  const localeKey = 'bahia-watch-lang';
+  const T = {
+    en: {
+      navTrack:'Storm track',navCommunities:'Communities',navCameras:'Live cameras',share:'Share',nhcLink:'NHC advisory',
+      eyebrow:'PUERTO VALLARTA & BANDERAS BAY',heroTitle1:'Know the storm.',heroTitle2:'Know your coast.',
+      heroDescription:'Official hurricane positions from NOAA, local weather-model estimates, and cameras along the bay in one place.',
+      viewTrack:'Explore track',viewCameras:'View webcams',currentSituation:'CURRENT SITUATION',officialObservation:'Official observation',
+      safetyTitle:'Important:',safetyText:'A hurricane center does not have to cross your location to cause dangerous rain, surf, floods, or landslides. Follow official alerts and evacuation orders.',officialAlerts:'Official alerts',
+      metricMove:'MOVING',metricWind:'CORE WINDS',metricPressure:'PRESSURE',metricCoordinates:'CURRENT CENTER',kmh:'km/h',coreWarning:'At storm center, not your town',centralPressure:'Minimum central pressure',coordinatesNote:'Official center coordinates',
+      section01:'01 / STORM TRAJECTORY',mapHeading:'Where is the eye headed?',openNOAA:'Open official NHC map',currentEye:'Latest center',forecastEye:'Forecast center',townPin:'Communities',
+      mapFootnote:'Dots and line represent forecast center positions, not the boundaries of wind or rain. Forecast points are not interpolated. Always review the official NHC cone of uncertainty.',
+      trackInterpretation:'FORECAST INTERPRETATION',centerNotImpact:"The eye's path is not the same as the storm's impact.",forecastPositions:'Official forecast points',forecastLoading:'Loading NHC forecast positions...',arrivalLimit:'Arrival-time limitation',arrivalCaveat:'Neighborhood rain estimates are model-based. They are not predictions that the hurricane eye will arrive in every community.',certaintyTitle:'What remains uncertain',certaintyText:'Small changes in the track can change local risk significantly. Rainbands and gusts can arrive ahead of the center.',readForecast:'Read official forecast',
+      section02:'02 / LOCAL IMPACTS',communitiesHeading:'Your coast, community by community.',communitySubtitle:'Model forecasts for rain and wind. Distinct from the official NHC forecast of the eye\'s location.',
+      modelDisclosure:'Open-Meteo estimates may substantially underpredict hurricane winds or localized intense rainfall. Numbers are not observations or guarantees. For safety decisions, prioritize NHC, CONAGUA and Proteccion Civil.',
+      section03:'03 / EYES ON THE COAST',camerasHeading:'Live camera directory',cameraSubtitle:'Public camera links to observe conditions. A labeled camera may be temporarily offline; always verify its playback timestamp.',videoCaution:'NOT WEATHER INSTRUMENTS',
+      clickToLoad:"Tap play to load El Dorado's YouTube stream",featuredCamera:'FEATURED CAMERA / VERIFIED LOCATION',elDoradoLocation:'Los Muertos Beach, next to the pier, Puerto Vallarta',elDoradoDescription:'Beachfront view toward Los Muertos Pier and Banderas Bay. Camera operated by El Dorado Restaurant.',watchOnYoutube:'Watch on YouTube',officialCameraPage:'Official camera page',
+      section04:'04 / TRUSTED INFORMATION',sourcesHeading:'Go to the source.',sourcesIntro:'NHC storm and Open-Meteo model data are retrieved automatically. Mexican authorities are linked directly for official local bulletins and evacuation notices, which are not automatically verified by this site.',
+      sourceNHC:'Official track, coordinates, intensity and warnings',sourceSMN:'Mexican rainfall and marine advisories',sourcePC:'Local evacuation, shelter and emergency information',sourceModel:'Supplemental hourly neighborhood weather models',automatic:'AUTOMATIC DATA',directLink:'DIRECT OFFICIAL LINK',
+      footerInfo:'Free community dashboard. Not an official warning system. Do not use it as your sole source for life-safety decisions.',
+      sample:'DEMO SNAPSHOT',checked:'LAST CHECKED',stale:'OLD DATA - VERIFY WITH NHC',live:'MOST RECENT CHECK',noStorm:'NO ACTIVE SIMON ADVISORY',unavailable:'DATA UNAVAILABLE',
+      category:'Category',tropicalStorm:'Tropical storm',depression:'Tropical depression',postTropical:'Post-tropical',unknown:'Unknown',
+      forecastNone:'An official forecast track could not be parsed. Use the NHC link for the latest authoritative map.',
+      closest:'Closest shown forecast center to Garza Blanca:',roughDistance:'approx.',forecastCaution:'These are discrete NHC forecast points, not an exact closest-approach calculation.',
+      modelForecast:'WEATHER MODEL',rain24:'Rain next 24h',windMax:'Model wind peak',rainStart:'Possible heavier rain from',rainUnknown:'No confident onset hour available',
+      waiting:'Forecast data not available yet',notOfficial:'Not an official warning',viewCamera:'Open camera',cameraOfficial:'OPERATOR CAMERA',cameraDirectory:'DIRECTORY LINK',
+      cardRiskGarza:'Hillside drainage, falling debris, coastal waves and Highway 200 access.',
+      cardRiskMismaloya:'Steep slopes, flash flooding, coastal waves and road access.',
+      cardRiskBoca:'River mouth, high surf, stream flooding and access roads.',
+      cardRiskJuntas:'River crossings, fast runoff, mountain slopes and Highway 200.',
+      cardRiskPv:'Low-lying streets, floodwater, beachfront surf and road conditions.',
+      copied:'Link copied to clipboard',sharing:'Share Bahia Storm Watch',shareMessage:'Official hurricane updates, Banderas Bay community forecasts and public coastal webcams:',
+      shortSouth:'SOUTH BAY',shortCentral:'SOUTH / CITY',shortDirectory:'OTHER CAMERAS',
+      namedGarza:'Garza Blanca / Villa Marta',namedMismaloya:'Mismaloya',namedBoca:'Boca de Tomatlan',namedJuntas:'Las Juntas y los Veranos',namedPv:'Puerto Vallarta Centro',
+      parkRoyalDescription:'Operator webcam at Grand Park Royal, by Las Gemelas beach.',garzaCamDescription:'Official beach and bay view from Garza Blanca, close to Villa Marta.',mousaiCamDescription:'Official live-view page from Hotel Mousai in the southern hotel zone.',otherCamsDescription:'Additional camera listings including Las Gemelas and Conchas Chinas. Availability can change.',
+      timeLocal:'Local time',asOf:'As of',coordinates:'Coordinates',movement:'Moving',forecastDot:'Forecast point',noCenter:'No current coordinates',lastChecked:'Data checked',hours:'hours',rainProb:'rain probability',warningOld:'This is old data; check NHC directly before making safety decisions.',
+      viewSource:'Source',soon:'Available after first scheduled data refresh',readMore:'Read more',
+    },
+    es: {
+      navTrack:'Trayectoria',navCommunities:'Comunidades',navCameras:'C\u00e1maras en vivo',share:'Compartir',nhcLink:'Aviso del NHC',
+      eyebrow:'PUERTO VALLARTA Y BAH\u00cdA DE BANDERAS',heroTitle1:'Conoce la tormenta.',heroTitle2:'Protege tu costa.',
+      heroDescription:'Posiciones oficiales del hurac\u00e1n seg\u00fan NOAA, pron\u00f3sticos meteorol\u00f3gicos locales y c\u00e1maras de la bahia en un solo lugar.',
+      viewTrack:'Ver trayectoria',viewCameras:'Ver c\u00e1maras',currentSituation:'SITUACI\u00d3N ACTUAL',officialObservation:'Observaci\u00f3n oficial',
+      safetyTitle:'Importante:',safetyText:'No es necesario que el ojo del hurac\u00e1n cruce una comunidad para provocar lluvias, oleaje, inundaciones o deslaves peligrosos. Sigue las alertas oficiales y \u00f3rdenes de evacuaci\u00f3n.',officialAlerts:'Alertas oficiales',
+      metricMove:'DESPLAZAMIENTO',metricWind:'VIENTOS EN EL N\u00daCLEO',metricPressure:'PRESI\u00d3N',metricCoordinates:'CENTRO ACTUAL',kmh:'km/h',coreWarning:'En el centro, no en tu comunidad',centralPressure:'Presion central m\u00ednima',coordinatesNote:'Coordenadas oficiales del centro',
+      section01:'01 / TRAYECTORIA DEL HURAC\u00c1N',mapHeading:'Hacia d\u00f3nde se dirige el ojo?',openNOAA:'Abrir mapa oficial NHC',currentEye:'Ultimo centro',forecastEye:'Centro pronosticado',townPin:'Comunidades',
+      mapFootnote:'Los puntos y la l\u00ednea representan posiciones pronosticadas del centro, no los l\u00edmites del viento o la lluvia. No se interpolan los puntos. Consulta el cono de incertidumbre del NHC.',
+      trackInterpretation:'COMO INTERPRETAR EL PRON\u00d3STICO',centerNotImpact:'La trayectoria del ojo no es igual al impacto del hurac\u00e1n.',forecastPositions:'Puntos oficiales del pron\u00f3stico',forecastLoading:'Cargando posiciones pronosticadas del NHC...',arrivalLimit:'Limitaciones de horarios',arrivalCaveat:'Las horas de lluvia por comunidad son estimaciones de un modelo meteorol\u00f3gico. No indican que el ojo llegara a cada poblacion.',certaintyTitle:'Lo que a\u00fan no se sabe',certaintyText:'Pequenos cambios de trayectoria pueden modificar mucho el riesgo local. Las bandas de lluvia y r\u00e1fagas pueden llegar antes del centro.',readForecast:'Leer pron\u00f3stico oficial',
+      section02:'02 / IMPACTOS LOCALES',communitiesHeading:'Nuestra costa, comunidad por comunidad.',communitySubtitle:'Pron\u00f3sticos modelados de lluvia y viento, diferentes de la ubicaci\u00f3n oficial prevista para el ojo.',
+      modelDisclosure:'Los modelos de Open-Meteo pueden subestimar mucho los vientos del hurac\u00e1n o las lluvias intensas locales. No son mediciones ni garantias. Para decisiones de seguridad, consulta NHC, CONAGUA y Proteccion Civil.',
+      section03:'03 / VISTAS DE LA COSTA',camerasHeading:'Directorio de c\u00e1maras en vivo',cameraSubtitle:'Enlaces a c\u00e1maras p\u00fablicas para observar condiciones. Algunas pueden quedar fuera de servicio; revisa siempre la fecha y hora del video.',videoCaution:'NO SON INSTRUMENTOS METEOROLOGICOS',
+      clickToLoad:'Presiona reproducir para abrir la transmision de El Dorado',featuredCamera:'C\u00c1MARA DESTACADA / UBICACI\u00d3N VERIFICADA',elDoradoLocation:'Playa Los Muertos, junto al muelle, Puerto Vallarta',elDoradoDescription:'Vista frente al mar hacia el muelle de Los Muertos y la Bah\u00eda de Banderas. C\u00e1mara operada por el restaurante El Dorado.',watchOnYoutube:'Ver en YouTube',officialCameraPage:'Pagina oficial de la c\u00e1mara',
+      section04:'04 / INFORMACI\u00d3N CONFIABLE',sourcesHeading:'Consulta las fuentes originales.',sourcesIntro:'Los datos del NHC y los modelos de Open-Meteo se descargan autom\u00e1ticamente. Las autoridades mexicanas se enlazan directamente para consultar boletines y avisos de evacuaci\u00f3n, que esta pagina no verifica autom\u00e1ticamente.',
+      sourceNHC:'Trayectoria, coordenadas, intensidad y avisos oficiales',sourceSMN:'Avisos de lluvia y pron\u00f3sticos maritimos en Mexico',sourcePC:'Avisos locales de evacuaci\u00f3n, refugios y emergencias',sourceModel:'Modelos horarios complementarios por comunidad',automatic:'DATOS AUTOM\u00c1TICOS',directLink:'ENLACE OFICIAL DIRECTO',
+      footerInfo:'Panel comunitario gratuito, no es un sistema oficial de alertas. No lo uses como \u00fanica fuente para decisiones sobre tu seguridad.',
+      sample:'MUESTRA DE DEMOSTRACION',checked:'\u00daLTIMA CONSULTA',stale:'DATOS ANTIGUOS - VERIFICA CON NHC',live:'\u00daLTIMA CONSULTA',noStorm:'SIN AVISO ACTIVO DE SIMON',unavailable:'DATOS NO DISPONIBLES',
+      category:'Categor\u00eda',tropicalStorm:'Tormenta tropical',depression:'Depresion tropical',postTropical:'Postropical',unknown:'Desconocido',
+      forecastNone:'No se pudo procesar la trayectoria oficial. Abre el enlace del NHC para ver su mapa actualizado.',
+      closest:'Centro pronosticado m\u00e1s cercano a Garza Blanca, entre los puntos mostrados:',roughDistance:'aprox.',forecastCaution:'Son puntos individuales del pron\u00f3stico del NHC; no es un calculo exacto de m\u00e1xima aproximacion.',
+      modelForecast:'MODELO METEOROLOGICO',rain24:'Lluvia pr\u00f3x. 24 h',windMax:'Pico de viento (modelo)',rainStart:'Lluvia fuerte posible desde',rainUnknown:'Sin hora confiable de inicio',
+      waiting:'A\u00fan no hay pron\u00f3stico disponible',notOfficial:'No es un aviso oficial',viewCamera:'Abrir c\u00e1mara',cameraOfficial:'C\u00c1MARA DEL OPERADOR',cameraDirectory:'ENLACE A DIRECTORIO',
+      cardRiskGarza:'Drenaje de ladera, derrumbes, oleaje y acceso por carretera 200.',
+      cardRiskMismaloya:'Laderas, inundaciones repentinas, oleaje y accesos carreteros.',
+      cardRiskBoca:'Desembocadura del r\u00edo, alto oleaje, crecidas y caminos.',
+      cardRiskJuntas:'Cruces de r\u00edo, escurrimientos, laderas y carretera 200.',
+      cardRiskPv:'Calles bajas, inundaciones, oleaje y condiciones viales.',
+      copied:'Enlace copiado',sharing:'Compartir Bah\u00eda Storm Watch',shareMessage:'Informacion oficial del hurac\u00e1n, pron\u00f3sticos locales y c\u00e1maras en la Bah\u00eda de Banderas:',
+      shortSouth:'BAH\u00cdA SUR',shortCentral:'SUR / CIUDAD',shortDirectory:'MAS C\u00c1MARAS',
+      namedGarza:'Garza Blanca / Villa Marta',namedMismaloya:'Mismaloya',namedBoca:'Boca de Tomatl\u00e1n',namedJuntas:'Las Juntas y los Veranos',namedPv:'Puerto Vallarta Centro',
+      parkRoyalDescription:'C\u00e1mara del hotel Grand Park Royal, en la zona de playa Las Gemelas.',garzaCamDescription:'Vista oficial de playa y bahia en Garza Blanca, cerca de Villa Marta.',mousaiCamDescription:'Pagina oficial de c\u00e1mara en vivo del Hotel Mousai en la zona hotelera sur.',otherCamsDescription:'Directorio de otras c\u00e1maras como Las Gemelas y Conchas Chinas. Su disponibilidad puede cambiar.',
+      timeLocal:'Hora local',asOf:'Al',coordinates:'Coordenadas',movement:'Se mueve',forecastDot:'Punto pronosticado',noCenter:'Sin coordenadas actuales',lastChecked:'Datos consultados',hours:'horas',rainProb:'probabilidad de lluvia',warningOld:'Estos datos son antiguos; consulta directamente NHC antes de tomar decisiones de seguridad.',
+      viewSource:'Fuente',soon:'Disponible despues de la primera actualizacion automatica',readMore:'Leer m\u00e1s',
+    }
+  };
+
+
+  Object.assign(T.en, {
+    mapUnavailable:'Interactive map unavailable. Use the official NOAA map.',
+    demoWarning:'DEMONSTRATION ONLY — these sample values are not live storm information.',
+    partialData:'Some sources could not be refreshed. Unavailable community forecasts are hidden. Check official sources.',
+    refreshError:'The latest site data could not be downloaded. Any remaining numbers are from the previous check.',
+    gustMax:'Model gust peak',rainChance:'Peak hourly rain chance',
+    modelRetrieved:'Model data retrieved',forecastPeriod:'Forecast window',
+    modelUnavailable:'Current model data unavailable. Consult official forecasts.',
+    potentialCyclone:'Potential tropical cyclone',otherCameras:'Other bay cameras',
+    forecastIssued:'NHC forecast issued',
+    inactiveExplanation:'Simon is absent from the latest NHC active-storm list. This is not an all-clear for local hazards.',
+    rain24:'Modeled rain / 24h window',rainStart:'Possible heavier rain period',
+    coreWarning:'Maximum sustained cyclone winds, not local wind',
+    modelLicense:'Weather data: Open-Meteo (CC BY 4.0). Hourly data summarized into 24-hour totals and peaks.'
+  });
+  Object.assign(T.es, {
+    mapUnavailable:'Mapa interactivo no disponible. Consulta el mapa oficial de NOAA.',
+    demoWarning:'SOLO DEMOSTRACIÓN — estos valores de muestra no son información actual de la tormenta.',
+    partialData:'No se pudieron actualizar algunas fuentes. Los pronósticos locales no disponibles se ocultan. Consulta las fuentes oficiales.',
+    refreshError:'No se pudieron descargar los datos más recientes. Los valores restantes son de la consulta anterior.',
+    gustMax:'Ráfaga máxima (modelo)',rainChance:'Prob. horaria máxima de lluvia',
+    modelRetrieved:'Datos del modelo consultados',forecastPeriod:'Periodo del pronóstico',
+    modelUnavailable:'Datos actuales del modelo no disponibles. Consulta los pronósticos oficiales.',
+    potentialCyclone:'Ciclón tropical potencial',otherCameras:'Otras cámaras de la bahía',
+    forecastIssued:'Pronóstico NHC emitido',
+    inactiveExplanation:'Simon no aparece en la lista más reciente de ciclones activos del NHC. Esto no significa que no haya peligros locales.',
+    rain24:'Lluvia modelada / periodo de 24 h',rainStart:'Periodo posible de lluvia más fuerte',
+    coreWarning:'Viento sostenido máximo del ciclón, no viento local',
+    modelLicense:'Datos meteorológicos: Open-Meteo (CC BY 4.0). Datos horarios resumidos en totales y máximos de 24 horas.'
+  });
+
+  const towns=[
+    {key:'garza',name:'namedGarza',risk:'cardRiskGarza',lat:20.5543,lon:-105.2637,number:'01'},
+    {key:'mismaloya',name:'namedMismaloya',risk:'cardRiskMismaloya',lat:20.5293,lon:-105.2866,number:'02'},
+    {key:'boca',name:'namedBoca',risk:'cardRiskBoca',lat:20.51246,lon:-105.31494,number:'03'},
+    {key:'juntas',name:'namedJuntas',risk:'cardRiskJuntas',lat:20.4830,lon:-105.2924,number:'04'},
+    {key:'pv',name:'namedPv',risk:'cardRiskPv',lat:20.6067,lon:-105.235,number:'05'}
+  ];
+  const cameraItems=[
+    {name:'Garza Blanca Preserve',type:'cameraOfficial',group:'shortSouth',desc:'garzaCamDescription',link:'https://www.garzablancaresort.com/puerto-vallarta/live-cam'},
+    {name:'Hotel Mousai',type:'cameraOfficial',group:'shortSouth',desc:'mousaiCamDescription',link:'https://www.hotelmousai.com/puerto-vallarta/live-cam'},
+    {name:'Las Gemelas / Grand Park Royal',type:'cameraOfficial',group:'shortSouth',desc:'parkRoyalDescription',link:'https://www.park-royalhotels.com/webcam-grand-park-royal-puerto-vallarta.html'},
+    {name:'Other bay cameras',type:'cameraDirectory',group:'shortDirectory',desc:'otherCamsDescription',link:'https://showmepv.com/live-cams'}
+  ];
+  let savedLanguage='en';
+  try { savedLanguage=localStorage.getItem(localeKey)||'en'; } catch (_) {}
+  const requestedLanguage=new URLSearchParams(location.search).get('lang');
+  let lang=['en','es'].includes(requestedLanguage)?requestedLanguage:(savedLanguage==='es'?'es':'en');
+  let latest=null, map=null, mapLayers=[], refreshFailed=false;
+  const byId=id=>document.getElementById(id);
+  const t=key=>(T[lang][key]||T.en[key]||key);
+  function setText(id,s){const el=byId(id);if(el)el.textContent=s===undefined||s===null?'--':String(s);}
+  function safeUrl(candidate){try{const u=new URL(candidate);return u.protocol==='https:'&&u.hostname.endsWith('.noaa.gov')?u.href:null;}catch(_){return null;}}
+  function localTime(iso,showDate=true){if(!iso)return '--';const dt=new Date(iso);if(Number.isNaN(dt.valueOf()))return '--';return new Intl.DateTimeFormat(lang==='es'?'es-MX':'en-US',{timeZone:'America/Mexico_City',weekday:showDate?'short':undefined,month:showDate?'short':undefined,day:showDate?'numeric':undefined,hour:'numeric',minute:'2-digit',hour12:true}).format(dt);}
+  function direction(bearing){if(bearing===undefined||bearing===null||Number.isNaN(Number(bearing)))return '--';const dirs=lang==='es'?['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSO','SO','OSO','O','ONO','NO','NNO']:['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];return dirs[Math.round(Number(bearing)/22.5)%16]+' ('+Math.round(Number(bearing))+'\u00b0)';}
+  function stormCategory(s){if(!s||s.status!=='active')return t('unavailable');const k=s.winds_kts ?? (s.winds_mph==null?null:s.winds_mph/1.15078);if(s.classification==='HU')return k==null?t('unknown'):t('category')+' '+(k>=137?5:k>=113?4:k>=96?3:k>=83?2:1);if(s.classification==='TS')return t('tropicalStorm');if(s.classification==='TD')return t('depression');if(s.classification==='PTC')return t('postTropical');if(s.classification==='POT')return t('potentialCyclone');return t('unknown');}
+  function haversine(a,b,c,d){const R=6371,rad=Math.PI/180;const dl=(c-a)*rad,dp=(d-b)*rad;const q=Math.sin(dl/2)**2+Math.cos(a*rad)*Math.cos(c*rad)*Math.sin(dp/2)**2;return 2*R*Math.asin(Math.sqrt(q));}
+  function toast(message){const node=byId('toast');node.textContent=message;node.classList.add('visible');setTimeout(()=>node.classList.remove('visible'),2800);}
+  function refreshStaticText(){document.documentElement.lang=lang;byId('shareButton').setAttribute('aria-label',t('share'));byId('loadVideo').setAttribute('aria-label',t('clickToLoad')); document.querySelectorAll('[data-i18n]').forEach(node=>node.textContent=t(node.dataset.i18n));document.querySelectorAll('.lang-switch button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.lang===lang)));document.title=lang==='es'?'Bahia Storm Watch | Monitor de Huracanes':'Bahia Storm Watch | Hurricane Tracker';renderAll();}
+  function updateFreshness(){const strip=document.querySelector('.notice-rail');strip.classList.remove('stale');if(!latest){setText('freshLabel',t('unavailable'));setText('lastUpdated','--');return;}const demo=latest.mode!=='live';const age=(Date.now()-new Date(latest.checked_at).getTime())/3600000;const advisoryAge=latest.storm&&latest.storm.last_update?(Date.now()-new Date(latest.storm.last_update).getTime())/3600000:0;const nhcUnavailable=!latest.storm || (latest.errors||[]).some(x=>String(x).includes('NHC source unavailable'));const old=!Number.isFinite(age)||age < -0.25||age>1.5||!Number.isFinite(advisoryAge)||advisoryAge < -0.25||advisoryAge>6||nhcUnavailable||refreshFailed;if(demo||old)strip.classList.add('stale');setText('freshLabel',demo?t('sample'):old?t('stale'):t('live'));setText('lastUpdated',t('lastChecked')+': '+localTime(latest.checked_at)+' · '+t('timeLocal'));const problem=demo?t('demoWarning'):old?t('warningOld'):(latest.errors||[]).length?t('partialData'):'';setText('dataWarning',problem);byId('dataWarning').hidden=!problem;}
+  function renderStorm(){const s=latest&&latest.storm;updateFreshness();const valid=s&&s.status==='active';setText('stormName',s&&s.name?String(s.name).toUpperCase():'SIMON');setText('categoryText',valid?stormCategory(s):(!s?t('unavailable'):t('noStorm')));setText('stormLocation',valid?`${Number(s.lat).toFixed(1)}\u00b0 N  /  ${Math.abs(Number(s.lon)).toFixed(1)}\u00b0 W` : t('noCenter'));
+    setText('advisoryTime',valid?localTime(s.last_update):'--');setText('metricSpeed',valid?s.movement_kmh:'--');setText('metricDirection',valid?direction(s.movement_degrees):'--');setText('metricWindValue',valid?s.winds_kmh:'--');setText('metricPressureValue',valid?s.pressure_mb:'--');setText('metricCoordinatesValue',valid?`${Number(s.lat).toFixed(1)} N, ${Math.abs(Number(s.lon)).toFixed(1)} W`:'--');
+    const adv=safeUrl(s&&s.public_advisory);const forecast=safeUrl(s&&s.forecast_advisory);byId('topNHCLink').href=adv||'https://www.nhc.noaa.gov/';byId('forecastSourceLink').href=forecast||'https://www.nhc.noaa.gov/';byId('officialMapLink').href=safeUrl(s&&s.forecast_graphics)||'https://www.nhc.noaa.gov/';
+  }
+  function forecastPoints(s){return s&&s.status==='active'&&Array.isArray(s.forecast)?s.forecast.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180&&Date.parse(p.time)>Date.now()):[];}
+  function renderForecast(){const s=latest&&latest.storm, points=forecastPoints(s);if(!points.length){setText('forecastExplanation',s&&s.status==='not_active'?t('inactiveExplanation'):t('forecastNone'));return;}
+    const target=towns[0], closest=points.slice().sort((a,b)=>haversine(a.lat,a.lon,target.lat,target.lon)-haversine(b.lat,b.lon,target.lat,target.lon))[0];
+    const dist=Math.round(haversine(closest.lat,closest.lon,target.lat,target.lon));
+    setText('forecastExplanation',`${t('closest')} ${t('roughDistance')} ${dist} km (${localTime(closest.time)}). ${t('forecastCaution')} ${t('forecastIssued')}: ${localTime(s.forecast_issued)}.`);
+  }
+  function renderCommunities(){const node=byId('communityGrid');node.innerHTML='';towns.forEach(item=>{const forecast=latest&&latest.communities&&latest.communities[item.key];const modelAge=forecast?(Date.now()-Date.parse(forecast.retrieved_at))/3600000:Infinity;const available=forecast&&Array.isArray(forecast.hourly)&&forecast.hourly.length===24&&Number.isFinite(modelAge)&&modelAge>=-0.25&&modelAge<=1.5&&Date.parse(forecast.period_end)>Date.now();
+    const rain=available&&forecast.rain24h_mm!=null?`${forecast.rain24h_mm} mm`:'--';const wind=available&&forecast.max_wind24h_kmh!=null?`${forecast.max_wind24h_kmh} km/h`:'--';const onset=available?(forecast.rain_window?`${t('rainStart')} ${localTime(new Date(Math.floor(Date.parse(forecast.rain_window)/(3*3600000))*3*3600000).toISOString())} – ${localTime(new Date((Math.floor(Date.parse(forecast.rain_window)/(3*3600000))+1)*3*3600000).toISOString())}`:t('rainUnknown')):t('waiting');
+    const card=document.createElement('article');card.className='community-card';
+    const top=document.createElement('div');top.className='card-eyebrow';top.innerHTML=`<span>${t('modelForecast')}</span><span>${item.number} / 05</span>`;
+    const heading=document.createElement('h3');heading.textContent=t(item.name);
+    const risk=document.createElement('p');risk.className='risk';risk.textContent=t(item.risk);
+    const facts=document.createElement('div');facts.className='local-numbers';const rainFact=document.createElement('div'),windFact=document.createElement('div');
+    let label=document.createElement('small');label.textContent=t('rain24');let val=document.createElement('strong');val.textContent=rain;rainFact.append(label,val);
+    label=document.createElement('small');label.textContent=t('windMax');val=document.createElement('strong');val.textContent=wind;windFact.append(label,val);facts.append(rainFact,windFact);
+    for(const [key,value,unit] of [['gustMax',forecast&&forecast.max_gust24h_kmh,' km/h'],['rainChance',forecast&&forecast.max_rain_probability,'%']]){const fact=document.createElement('div');const l=document.createElement('small');l.textContent=t(key);const v=document.createElement('strong');v.textContent=available&&value!=null?value+unit:'--';fact.append(l,v);facts.append(fact);}
+    const foot=document.createElement('p');foot.className='rain-start';foot.textContent=onset;
+    const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');card.append(top,heading,risk,facts,foot,stamp);node.append(card);
+  });}
+  function renderCameras(){const node=byId('cameraGrid');node.innerHTML='';cameraItems.forEach(item=>{const card=document.createElement('article');card.className='camera-card';const top=document.createElement('div');top.className='topline';top.textContent=t(item.group)+' / '+t(item.type);const title=document.createElement('h3');title.textContent=item.type==='cameraDirectory'?t('otherCameras'):item.name;const desc=document.createElement('p');desc.textContent=t(item.desc);const a=document.createElement('a');a.href=item.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=t('viewCamera')+' \u2197';card.append(top,title,desc,a);node.append(card);});}
+  function clearMap(){for(const layer of mapLayers){try{map.removeLayer(layer)}catch(_){}}mapLayers=[];}
+  function renderMap(){if(!window.L){byId('mapFallback').hidden=false;return;}try{if(!map){map=L.map('map',{scrollWheelZoom:false,zoomControl:false}).setView([20.38,-105.37],8);L.control.zoom({position:'topright'}).addTo(map);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}).addTo(map);}clearMap();const positions=[];
+    for(const town of towns){const marker=L.circleMarker([town.lat,town.lon],{radius:6,weight:2,color:'#0a3643',fillColor:'#39c8ac',fillOpacity:1});marker.bindPopup(t(town.name));marker.addTo(map);mapLayers.push(marker);positions.push([town.lat,town.lon]);}
+    const s=latest&&latest.storm;if(s&&s.status==='active'&&Number.isFinite(Number(s.lat))&&Number.isFinite(Number(s.lon))){const here=L.circleMarker([s.lat,s.lon],{radius:11,weight:3,color:'#faf0df',fillColor:'#df9256',fillOpacity:1});const popup=document.createElement('div');popup.textContent=`${s.name||'Simon'} · ${t('asOf')} ${localTime(s.last_update)} · ${Number(s.lat).toFixed(1)}, ${Number(s.lon).toFixed(1)}`;here.bindPopup(popup);here.addTo(map);mapLayers.push(here);positions.push([s.lat,s.lon]);
+      const pts=forecastPoints(s).map(p=>({lat:Number(p.lat),lon:Number(p.lon),time:p.time}));if(pts.length){const coords=[[s.lat,s.lon],...pts.map(p=>[p.lat,p.lon])];const poly=L.polyline(coords,{color:'#ce8d52',weight:3,dashArray:'9,8',opacity:.95});poly.addTo(map);mapLayers.push(poly);pts.forEach(p=>{const dot=L.circleMarker([p.lat,p.lon],{radius:6,color:'#ffe9cc',weight:2,fillColor:'#bd804e',fillOpacity:1});dot.bindPopup(`${t('forecastDot')}<br>${localTime(p.time)}<br>${p.lat.toFixed(1)}, ${p.lon.toFixed(1)}`);dot.addTo(map);mapLayers.push(dot);positions.push([p.lat,p.lon]);});}
+    }const cameras=[{name:'El Dorado / Los Muertos Pier',lat:20.5927,lon:-105.2399,link:'https://www.eldoradopvr.com/live-stream'},
+      {name:'Garza Blanca webcam',lat:20.5528,lon:-105.2653,link:'https://www.garzablancaresort.com/puerto-vallarta/live-cam'},
+      {name:'Las Gemelas webcam',lat:20.5481,lon:-105.2732,link:'https://www.park-royalhotels.com/webcam-grand-park-royal-puerto-vallarta.html'}];
+    cameras.forEach(c=>{const m=L.marker([c.lat,c.lon],{icon:L.divIcon({className:'cam-map-icon',html:'&#128247;',iconSize:[27,27],iconAnchor:[13,13]})});const wrapper=document.createElement('div');const label=document.createElement('strong');label.textContent=c.name;const link=document.createElement('a');link.href=c.link;link.target='_blank';link.rel='noopener noreferrer';link.textContent=t('viewCamera')+' \u2197';wrapper.append(label,document.createElement('br'),link);m.bindPopup(wrapper);m.addTo(map);mapLayers.push(m);});
+    if(positions.length){map.fitBounds(L.latLngBounds(positions).pad(.19),{maxZoom:9,animate:false});}setTimeout(()=>map.invalidateSize(),90);
+  }catch(e){byId('mapFallback').hidden=false;console.warn('Map failed:',e);}}
+  function renderAll(){renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();}
+  async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
+  document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
+  byId('loadVideo').addEventListener('click',()=>{const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
+  byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
+  refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();},60*1000);
+})();
