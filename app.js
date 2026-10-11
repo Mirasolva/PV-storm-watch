@@ -113,12 +113,16 @@
     {key:'juntas',name:'namedJuntas',risk:'cardRiskJuntas',lat:20.4830,lon:-105.2924,number:'04'},
     {key:'pv',name:'namedPv',risk:'cardRiskPv',lat:20.6067,lon:-105.235,number:'05'}
   ];
+  Object.assign(T.en, {camerasHeading:'Watch the coast', cameraSubtitle:'Watch cameras right here. Tap a camera to start; switching cameras stops the previous stream. Availability can change—check the camera’s timestamp.', watchHere:'Watch here', closeCamera:'Close video', cameraHelp:'If the player stays blank or reports offline, try another camera.', cameraCredit:'Camera by', cameraDirect:'DIRECT PLAYER'});
+  Object.assign(T.es, {camerasHeading:'Mira la costa', cameraSubtitle:'Mira las cámaras aquí. Toca una para comenzar; al cambiar, se detiene la anterior. La disponibilidad puede cambiar: revisa la fecha y hora de la cámara.', watchHere:'Ver aquí', closeCamera:'Cerrar video', cameraHelp:'Si el reproductor queda en blanco o indica que está desconectado, prueba otra cámara.', cameraCredit:'Cámara de', cameraDirect:'REPRODUCTOR DIRECTO'});
   const cameraItems=[
-    {name:'Garza Blanca Preserve',type:'cameraOfficial',group:'shortSouth',desc:'garzaCamDescription',link:'https://www.garzablancaresort.com/puerto-vallarta/live-cam'},
-    {name:'Hotel Mousai',type:'cameraOfficial',group:'shortSouth',desc:'mousaiCamDescription',link:'https://www.hotelmousai.com/puerto-vallarta/live-cam'},
-    {name:'Las Gemelas / Grand Park Royal',type:'cameraOfficial',group:'shortSouth',desc:'parkRoyalDescription',link:'https://www.park-royalhotels.com/webcam-grand-park-royal-puerto-vallarta.html'},
-    {name:'Other bay cameras',type:'cameraDirectory',group:'shortDirectory',desc:'otherCamsDescription',link:'https://showmepv.com/live-cams'}
+    {name:'Las Gemelas / Grand Park Royal',credit:'Webcams de México / Grand Park Royal',embed:'https://www.youtube-nocookie.com/embed/V6Co4YdL25Q?autoplay=1&mute=1&rel=0'},
+    {name:'Los Muertos / Daiquiri Dick’s',credit:'Insider WiFi / Daiquiri Dick’s',embed:'https://g3.ipcamlive.com/player/player.php?alias=662abcbe448a7&autoplay=1'},
+    {name:'Malecón / Faro',credit:'Insider WiFi / Macaria',embed:'https://g3.ipcamlive.com/player/player.php?alias=662ab99645bff&autoplay=1'},
+    {name:'Marina Vallarta / Marina Towers',credit:'Marina Towers',embed:'https://g3.ipcamlive.com/player/player.php?alias=66a9475306b30&autoplay=1'},
+    {name:'Los Muertos / Vallarta Shores',credit:'Vallarta Shores',embed:'https://v.angelcam.com/iframe?v=51eyob6nr8'}
   ];
+  let cameraLanguage=null;
   let savedLanguage='en';
   try { savedLanguage=localStorage.getItem(localeKey)||'en'; } catch (_) {}
   const requestedLanguage=new URLSearchParams(location.search).get('lang');
@@ -175,15 +179,39 @@
     const foot=document.createElement('p');foot.className='rain-start';foot.textContent=onset;
     const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');card.append(top,heading,risk,facts,foot,stamp);node.append(card);
   });}
-  function renderCameras(){const node=byId('cameraGrid');node.innerHTML='';cameraItems.forEach(item=>{const card=document.createElement('article');card.className='camera-card';const top=document.createElement('div');top.className='topline';top.textContent=t(item.group)+' / '+t(item.type);const title=document.createElement('h3');title.textContent=item.type==='cameraDirectory'?t('otherCameras'):item.name;const desc=document.createElement('p');desc.textContent=t(item.desc);const a=document.createElement('a');a.href=item.link;a.target='_blank';a.rel='noopener noreferrer';a.textContent=t('viewCamera')+' \u2197';card.append(top,title,desc,a);node.append(card);});}
+  function stopCameras(){
+    document.querySelectorAll('.camera-player').forEach(node=>{node.replaceChildren();node.hidden=true;});
+    document.querySelectorAll('.camera-watch').forEach(button=>{button.textContent='▶ '+t('watchHere');button.setAttribute('aria-expanded','false');button.setAttribute('aria-label',t('watchHere')+': '+button.dataset.cameraName);});
+    byId('embedContainer').replaceChildren();byId('embedContainer').hidden=true;byId('videoPoster').hidden=false;
+  }
+  function renderCameras(){
+    // Weather refreshes must not interrupt a camera already playing.
+    if(cameraLanguage===lang)return;
+    cameraLanguage=lang;
+    const node=byId('cameraGrid');node.replaceChildren();
+    cameraItems.forEach((item,index)=>{
+      const card=document.createElement('article');card.className='camera-card';
+      const top=document.createElement('div');top.className='topline';top.textContent=t('cameraDirect');
+      const title=document.createElement('h3');title.textContent=item.name;
+      const credit=document.createElement('p');credit.textContent=t('cameraCredit')+': '+item.credit;
+      const player=document.createElement('div');player.className='camera-player';player.id='camera-player-'+index;player.hidden=true;
+      const button=document.createElement('button');button.type='button';button.dataset.cameraName=item.name;button.className='btn btn-primary camera-watch';button.textContent='▶ '+t('watchHere');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls',player.id);button.setAttribute('aria-label',t('watchHere')+': '+item.name);
+      button.addEventListener('click',()=>{
+        const wasOpen=!player.hidden;stopCameras();if(wasOpen)return;
+        const frame=document.createElement('iframe');frame.src=item.embed;frame.title=item.name;frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
+        player.append(frame);player.hidden=false;button.textContent=t('closeCamera');button.setAttribute('aria-expanded','true');button.setAttribute('aria-label',t('closeCamera')+': '+item.name);
+      });
+      card.append(top,title,credit,button,player);node.append(card);
+    });
+    const note=document.createElement('p');note.className='camera-help';note.textContent=t('cameraHelp');node.append(note);
+  }
   function clearMap(){for(const layer of mapLayers){try{map.removeLayer(layer)}catch(_){}}mapLayers=[];}
   function renderMap(){if(!window.L){byId('mapFallback').hidden=false;return;}try{if(!map){map=L.map('map',{scrollWheelZoom:false,zoomControl:false}).setView([20.38,-105.37],8);L.control.zoom({position:'topright'}).addTo(map);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}).addTo(map);}clearMap();const positions=[];
     for(const town of towns){const marker=L.circleMarker([town.lat,town.lon],{radius:6,weight:2,color:'#0a3643',fillColor:'#39c8ac',fillOpacity:1});marker.bindPopup(t(town.name));marker.addTo(map);mapLayers.push(marker);positions.push([town.lat,town.lon]);}
     const s=latest&&latest.storm;if(s&&s.status==='active'&&Number.isFinite(Number(s.lat))&&Number.isFinite(Number(s.lon))){const here=L.circleMarker([s.lat,s.lon],{radius:11,weight:3,color:'#faf0df',fillColor:'#df9256',fillOpacity:1});const popup=document.createElement('div');popup.textContent=`${s.name||'Simon'} · ${t('asOf')} ${localTime(s.last_update)} · ${Number(s.lat).toFixed(1)}, ${Number(s.lon).toFixed(1)}`;here.bindPopup(popup);here.addTo(map);mapLayers.push(here);positions.push([s.lat,s.lon]);
       const pts=forecastPoints(s).map(p=>({lat:Number(p.lat),lon:Number(p.lon),time:p.time}));if(pts.length){const coords=[[s.lat,s.lon],...pts.map(p=>[p.lat,p.lon])];const poly=L.polyline(coords,{color:'#ce8d52',weight:3,dashArray:'9,8',opacity:.95});poly.addTo(map);mapLayers.push(poly);pts.forEach(p=>{const dot=L.circleMarker([p.lat,p.lon],{radius:6,color:'#ffe9cc',weight:2,fillColor:'#bd804e',fillOpacity:1});dot.bindPopup(`${t('forecastDot')}<br>${localTime(p.time)}<br>${p.lat.toFixed(1)}, ${p.lon.toFixed(1)}`);dot.addTo(map);mapLayers.push(dot);positions.push([p.lat,p.lon]);});}
     }const cameras=[{name:'El Dorado / Los Muertos Pier',lat:20.5927,lon:-105.2399,link:'https://www.eldoradopvr.com/live-stream'},
-      {name:'Garza Blanca webcam',lat:20.5528,lon:-105.2653,link:'https://www.garzablancaresort.com/puerto-vallarta/live-cam'},
-      {name:'Las Gemelas webcam',lat:20.5481,lon:-105.2732,link:'https://www.park-royalhotels.com/webcam-grand-park-royal-puerto-vallarta.html'}];
+      {name:'Las Gemelas webcam',lat:20.5481,lon:-105.2732,link:'https://www.youtube.com/watch?v=V6Co4YdL25Q'}];
     cameras.forEach(c=>{const m=L.marker([c.lat,c.lon],{icon:L.divIcon({className:'cam-map-icon',html:'&#128247;',iconSize:[27,27],iconAnchor:[13,13]})});const wrapper=document.createElement('div');const label=document.createElement('strong');label.textContent=c.name;const link=document.createElement('a');link.href=c.link;link.target='_blank';link.rel='noopener noreferrer';link.textContent=t('viewCamera')+' \u2197';wrapper.append(label,document.createElement('br'),link);m.bindPopup(wrapper);m.addTo(map);mapLayers.push(m);});
     if(positions.length){map.fitBounds(L.latLngBounds(positions).pad(.19),{maxZoom:9,animate:false});}setTimeout(()=>map.invalidateSize(),90);
   }catch(e){byId('mapFallback').hidden=false;console.warn('Map failed:',e);}}
@@ -197,7 +225,7 @@
     try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash);}catch(_){}
     renderUnits();renderStorm();renderForecast();renderCommunities();
   }));
-  byId('loadVideo').addEventListener('click',()=>{const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
+  byId('loadVideo').addEventListener('click',()=>{stopCameras();const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
   byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);shareUrl.searchParams.set('units',units);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
   refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();},60*1000);
 })();

@@ -86,3 +86,11 @@ body{background:radial-gradient(ellipse at 10% 0%,#153644 0,transparent 42rem),#
 @media(max-width:740px){.video-panel{min-height:310px}.video-caption{bottom:14px;left:16px;right:16px;line-height:1.5}}
 
 .unit-toolbar{display:flex;justify-content:flex-end;align-items:center;gap:12px;padding-top:14px;font-size:13px;color:var(--muted)}.unit-switch{display:flex;border:1px solid var(--line);padding:3px;border-radius:10px;background:#0b2330}.unit-switch button{min-height:44px;border:0;border-radius:7px;padding:8px 14px;background:transparent;color:#c4d7df;font-size:13px;font-weight:700}.unit-switch button[aria-pressed=true]{background:#b1e5d8;color:#09252d}@media(max-width:740px){.unit-toolbar{justify-content:space-between;padding-top:12px}.unit-switch button{padding-inline:12px}}
+
+/* On-page camera players stay responsive and load only on request. */
+.camera-watch{align-self:flex-start;min-height:44px;white-space:normal}
+.camera-player{width:100%;aspect-ratio:16/9;background:#050f17;border-radius:8px;overflow:hidden;margin-top:18px}
+.camera-player[hidden]{display:none}
+.camera-player iframe{display:block;width:100%;height:100%;border:0}
+.camera-help{grid-column:1/-1;font-size:14px;color:#b0c5ce;margin:0}
+.camera-card{min-width:0;align-self:start}
