@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.css?v=dark2">
+  <link rel="stylesheet" href="styles.css?v=compare1">
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script defer src="app.js?v=dark2"></script>
+  <script defer src="app.js?v=compare1"></script>
 </head>
 <body>
   <div class="shell">
@@ -22,7 +22,7 @@
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#track" data-i18n="navTrack">Storm track</a>
         <a href="#communities" data-i18n="navCommunities">Communities</a>
-        <a href="#cameras" data-i18n="navCameras">Live cameras</a><a href="#research" data-i18n="researchTitle">Dig deeper</a>
+        <a href="#cameras" data-i18n="navCameras">Live cameras</a><a href="#forecastCompare" data-i18n="compareNav">Forecasts</a>
       </nav>
       <div class="header-actions">
 
@@ -43,6 +43,13 @@
         </div>
       </section>
 
+      <section id="forecastCompare" class="forecast-compare" aria-labelledby="compareTitle">
+        <div class="section-heading"><div><span class="section-kicker" data-i18n="compareKicker">THE FORECAST / SOURCE BY SOURCE</span><h2 id="compareTitle" data-i18n="compareTitle">What to expect—and when</h2></div></div>
+        <p data-i18n="compareIntro">Read the forecasts here. Official coastal outlooks and your town’s hourly model cover different areas and periods.</p>
+        <div id="timingStrip" class="timing-strip"></div>
+        <div id="forecastCards" class="forecast-cards"></div>
+        <p id="comparisonNote" class="comparison-note"></p>
+      </section>
       <div class="safety-banner" role="note"><span class="safety-symbol">!</span><p><strong data-i18n="safetyTitle">Important:</strong> <span data-i18n="safetyText">A hurricane center does not have to cross your location to cause dangerous rain, surf, floods, or landslides. Follow official alerts and evacuation orders.</span></p><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer"><span data-i18n="officialAlerts">Official alerts</span> &#8599;</a></div>
 
       <details class="storm-details"><summary data-i18n="stormDetails">Storm measurements & coordinates</summary>      <section class="metrics" aria-label="Current storm facts">

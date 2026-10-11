@@ -114,10 +114,10 @@ MAX WIND 90 KT'''
         with tempfile.TemporaryDirectory() as tmp:
             output=Path(tmp)/'latest.json'
             output.write_text(json.dumps({'mode':'sample','storm':{'status':'active','last_update':'2026-10-11T12:00:00Z','source':'https://www.nhc.noaa.gov/CurrentStorms.json'}}))
-            with patch('scripts.update.DATA',output), patch('scripts.update.get_storm',side_effect=ValueError('offline')), patch('scripts.update.get_local_forecast',side_effect=ValueError('offline')):
+            with patch('scripts.update.DATA',output), patch('scripts.update.get_storm',side_effect=ValueError('offline')), patch('scripts.update.get_local_forecast',side_effect=ValueError('offline')), patch('scripts.update.fetch_text',side_effect=ValueError('offline')):
                 main()
             result=json.loads(output.read_text())
             self.assertIsNone(result['storm'])
-            self.assertEqual(len(result['errors']),6)
+            self.assertEqual(len(result['errors']),7)
 
 if __name__=='__main__':unittest.main()

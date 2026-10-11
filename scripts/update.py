@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """Fetch NOAA/NHC & Open-Meteo information for the static storm dashboard.
 
-No scraping of emergency orders; link official Mexican authority pages instead.
+Aggregates timestamp-verified official forecasts; does not infer emergency orders.
 Runs at GitHub Actions build time. Uses only Python standard library.
 """
 import json
+try:
+    from scripts.forecasts import parse_nhc, parse_smn, SMN_URL
+except ModuleNotFoundError:
+    from forecasts import parse_nhc, parse_smn, SMN_URL
 import math
 import re
 import urllib.error
@@ -35,7 +39,7 @@ def fetch_json(url):
         return json.loads(response.read().decode('utf-8'))
 
 def fetch_text(url):
-    if not url.startswith('https://www.nhc.noaa.gov/'):
+    if not (url.startswith('https://www.nhc.noaa.gov/') or url == SMN_URL):
         raise ValueError('Unexpected URL authority')
     req = urllib.request.Request(url, headers={'User-Agent':USER_AGENT,'Accept':'text/html,text/plain'})
     with urllib.request.urlopen(req,timeout=20) as response:
@@ -151,6 +155,7 @@ def get_storm():
         'track_kmz':(matching.get('forecastTrack') or {}).get('kmzFile'),
         'cone_kmz':(matching.get('trackCone') or {}).get('kmzFile'),
         'forecast': [],
+        'bulletin': None,
         'forecast_error':None,
         'source':NHC_URL,
     }
@@ -164,6 +169,10 @@ def get_storm():
             storm['forecast']=forecast
         except (ValueError,urllib.error.URLError,TimeoutError) as e:
             storm['forecast_error']=type(e).__name__
+    public_ref=matching.get('publicAdvisory') or {}
+    if public_ref.get('url') and public_ref.get('issuance'):
+        try:storm['bulletin']=parse_nhc(fetch_text(public_ref['url']), public_ref, storm['id'])
+        except (ValueError,urllib.error.URLError,TimeoutError):pass
     from urllib.parse import urlsplit, urlunsplit
     for kind,query in [('cone','cone'),('rain','rainqpf'),('wind','tswind120')]:
         storm[kind+'_image_url']=None
@@ -219,6 +228,10 @@ def main():
         'weather_source':'https://open-meteo.com/','nhc_source':NHC_URL}
     try:result['storm']=get_storm()
     except Exception as e:result['errors'].append('NHC source unavailable: '+type(e).__name__)
+    try:result['smn']=parse_smn(fetch_text(SMN_URL))
+    except Exception as e:
+        result['smn']={'status':'unavailable','source':SMN_URL}
+        result['errors'].append('SMN bulletin unavailable: '+type(e).__name__)
     for key,name,lat,lon in COMMUNITIES:
         try:result['communities'][key]=get_local_forecast(lat,lon)
         except Exception as e:

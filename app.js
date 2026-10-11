@@ -16,7 +16,7 @@
       modelDisclosure:'Open-Meteo estimates may substantially underpredict hurricane winds or localized intense rainfall. Numbers are not observations or guarantees. For safety decisions, prioritize NHC, CONAGUA and Proteccion Civil.',
       section03:'03 / EYES ON THE COAST',camerasHeading:'Live camera directory',cameraSubtitle:'Public camera links to observe conditions. A labeled camera may be temporarily offline; always verify its playback timestamp.',videoCaution:'NOT WEATHER INSTRUMENTS',
       clickToLoad:"Tap play to load El Dorado's YouTube stream",featuredCamera:'FEATURED CAMERA / VERIFIED LOCATION',elDoradoLocation:'Los Muertos Beach, next to the pier, Puerto Vallarta',elDoradoDescription:'Beachfront view toward Los Muertos Pier and Banderas Bay. Camera operated by El Dorado Restaurant.',watchOnYoutube:'Watch on YouTube',officialCameraPage:'Official camera page',
-      section04:'04 / TRUSTED INFORMATION',sourcesHeading:'Go to the source.',sourcesIntro:'NHC storm and Open-Meteo model data are retrieved automatically. Mexican authorities are linked directly for official local bulletins and evacuation notices, which are not automatically verified by this site.',
+      section04:'04 / TRUSTED INFORMATION',sourcesHeading:'Go to the source.',sourcesIntro:'NHC advisories, SMN regional forecasts and Open-Meteo estimates are retrieved automatically. Evacuation notices and local closures are not verified by this site.',
       sourceNHC:'Official track, coordinates, intensity and warnings',sourceSMN:'Mexican rainfall and marine advisories',sourcePC:'Local evacuation, shelter and emergency information',sourceModel:'Supplemental hourly neighborhood weather models',automatic:'AUTOMATIC DATA',directLink:'DIRECT OFFICIAL LINK',
       footerInfo:'Free community dashboard. Not an official warning system. Do not use it as your sole source for life-safety decisions.',
       sample:'DEMO SNAPSHOT',checked:'LAST CHECKED',stale:'OLD DATA - VERIFY WITH NHC',live:'MOST RECENT CHECK',noStorm:'NO ACTIVE SIMON ADVISORY',unavailable:'DATA UNAVAILABLE',
@@ -297,6 +297,45 @@
     const root=byId('questionList');const opened=new Set([...root.querySelectorAll('details[open]')].map(x=>x.dataset.question));root.replaceChildren();
     visitorQuestions[lang].forEach(([question,answer,target,label],index)=>{const details=document.createElement('details');details.className='research-detail';details.dataset.question=String(index);details.open=opened.has(String(index));const summary=document.createElement('summary');summary.textContent=question;const p=document.createElement('p');p.textContent=answer;const a=document.createElement('a');a.className='question-link';a.href='#'+target;a.textContent=label+' ↓';a.addEventListener('click',()=>{if(target==='hourlyForecast')byId('hourlyDetails').open=true;if(target==='track'){mapView=index===1?'wind':'cone';renderMapViews();}if(target==='research')document.querySelector('#research details').open=true;});details.append(summary,p,a);root.append(details);});
   }
+  Object.assign(T.en,{compareNav:'Forecasts',compareKicker:'THE FORECAST / SOURCE BY SOURCE',compareTitle:'What to expect—and when',compareIntro:'Read the forecasts here. Official coastal outlooks and your town’s hourly model cover different areas and periods.'});
+  Object.assign(T.es,{compareNav:'Pronósticos',compareKicker:'EL PRONÓSTICO / FUENTE POR FUENTE',compareTitle:'Qué esperar y cuándo',compareIntro:'Lee los pronósticos aquí. Los avisos costeros oficiales y el modelo de tu comunidad abarcan zonas y periodos distintos.'});
+  function renderComparison(){
+    const es=lang==='es',say=(en,sp)=>es?sp:en,root=byId('forecastCards'),strip=byId('timingStrip');
+    const opened=new Set([...root.querySelectorAll('details[open]')].map(x=>x.dataset.source));root.replaceChildren();strip.replaceChildren();
+    const s=latest?.storm,f=latest?.communities?.[selectedTown],town=towns.find(x=>x.key===selectedTown),available=modelAvailable(f)&&latest?.mode==='live';
+    const fresh=(b,h)=>{const age=(Date.now()-Date.parse(b?.issued_at))/3600000;return latest?.mode==='live'&&b?.status==='available'&&age>=-0.25&&age<=h;};
+    const nhc=s?.status==='active'&&fresh(s?.bulletin,9)?s.bulletin:null,smn=fresh(latest?.smn,24)?latest.smn:null;
+    function el(tag,text,cls){const n=document.createElement(tag);if(text)n.textContent=text;if(cls)n.className=cls;return n;}
+    function fact(title,text,stamp){const n=el('article',null,'timing-fact');n.append(el('h3',title),el('p',text),el('small',stamp));strip.append(n);}
+    const points=forecastPoints(s),closest=points.slice().sort((a,b)=>haversine(a.lat,a.lon,town.lat,town.lon)-haversine(b.lat,b.lon,town.lat,town.lon))[0];
+    const trackAge=(Date.now()-Date.parse(s?.forecast_issued))/3600000;
+    fact(say('Closest forecast center','Centro pronosticado más cercano'),latest?.mode==='live'&&closest&&trackAge>=-0.25&&trackAge<=9?localTime(closest.time)+' · '+measurement(haversine(closest.lat,closest.lon,town.lat,town.lon),'distance')+' '+unitLabel('distance')+' '+say('from ','de ')+t(town.name):say('Current track timing unavailable','Horario de trayectoria no disponible'),say('NHC forecast issued: ','Pronóstico NHC emitido: ')+localTime(s?.forecast_issued)+say(' · Closest shown point, not exact closest approach or arrival.',' · Punto mostrado más cercano, no aproximación exacta ni llegada.'));
+    const future=available?f.hourly.filter(h=>Date.parse(h.time)+3600000>Date.now()):[];
+    const rain=future.filter(h=>h.rain_mm!=null).sort((a,b)=>b.rain_mm-a.rain_mm)[0];
+    fact(say('Wettest modeled hour','Hora de mayor lluvia del modelo'),rain&&rain.rain_mm>0?localTime(rain.time)+' · '+measurement(rain.rain_mm,'rain')+' '+unitLabel('rain'):say('No reliable peak hour available','Sin hora máxima confiable'),say('Open-Meteo · Retrieved: ','Open-Meteo · Consultado: ')+localTime(f?.retrieved_at)+say(' · Other hours may tie.',' · Puede haber empates.'));
+    fact(say('When stronger winds begin','Cuándo comienza el viento fuerte'),nhc?.wind||say('Official wind timing unavailable here','Horario oficial del viento no disponible aquí'),say('NHC · Issued: ','NHC · Emitido: ')+localTime(nhc?.issued_at)+say(' · Regional, not a town-specific arrival time.',' · Regional, no una hora de llegada a tu comunidad.'));
+    function card(name,scope,b,rows,key){
+      const article=el('article',null,'source-forecast');article.append(el('span',scope,'source-scope'),el('h3',name));
+      article.append(el('small',b?say('Issued: ','Emitido: ')+localTime(b.issued_at):say('Current bulletin unavailable · no forecast inferred','Aviso actual no disponible · no se infiere pronóstico')));
+      if(b){article.append(el('p',b.language==='es'?say('Official excerpts · Original Spanish','Extractos oficiales · Español original'):say('Official excerpts · Original English','Extractos oficiales · Inglés original'),'original-language'));}
+      const list=el('dl');rows.forEach(([title,value])=>{const block=el('div');block.append(el('dt',title),el('dd',value||say('Not provided in this bulletin','No indicado en este aviso')));list.append(block);});article.append(list);
+      if(b){const details=el('details');details.dataset.source=key;details.open=opened.has(key);details.append(el('summary',say('Read more here','Leer más aquí')),el('p',b.details));if(b.warnings)details.append(el('p',b.warnings));article.append(details);const a=el('a',say('Original bulletin ↗','Aviso original ↗'));a.href=b.source;a.target='_blank';a.rel='noopener noreferrer';article.append(a);}root.append(article);return article;
+    }
+    const labels=[say('Timing / track','Cuándo / trayectoria'),say('Rainfall','Lluvia'),say('Wind','Viento'),say('Coast / waves','Costa / oleaje')];
+    card('NOAA / NHC',say('OFFICIAL · WEST-CENTRAL MEXICO','OFICIAL · COSTA CENTRO-OCCIDENTAL'),nhc,labels.map((x,i)=>[x,nhc?nhc[['timing','rain','wind','coast'][i]]:say('Awaiting a verified current bulletin','Esperando un aviso actual verificado')]),'nhc');
+    card('CONAGUA / SMN',say('OFFICIAL · JALISCO REGIONAL OUTLOOK','OFICIAL · PRONÓSTICO REGIONAL DE JALISCO'),smn,labels.map((x,i)=>[x,smn?smn[['timing','rain','wind','coast'][i]]:say('Awaiting a verified current bulletin','Esperando un aviso actual verificado')]),'smn');
+    const model=card('Open-Meteo',say('SUPPLEMENTAL MODEL · ','MODELO COMPLEMENTARIO · ')+t(town.name),null,[], 'model');model.querySelector('small').textContent=available?say('Retrieved: ','Consultado: ')+localTime(f.retrieved_at):t('modelUnavailable');
+    const rows=available?[
+      [say('Forecast period','Periodo del pronóstico'),localTime(f.period_start)+' – '+localTime(f.period_end)],
+      [say('Rain · 24 hours','Lluvia · 24 horas'),measurement(f.rain24h_mm,'rain')+' '+unitLabel('rain')],
+      [say('Maximum wind / gust','Viento máximo / ráfaga'),measurement(f.max_wind24h_kmh,'speed')+' / '+measurement(f.max_gust24h_kmh,'speed')+' '+unitLabel('speed')],
+      [say('Coastal conditions','Condiciones costeras'),say('Not supplied by this model feed.','No incluidas en este modelo.')]
+    ]:[];const dl=model.querySelector('dl');rows.forEach(([title,value])=>{const block=el('div');block.append(el('dt',title),el('dd',value));dl.append(block);});
+    model.append(el('p',say('May substantially underestimate hurricane impacts. Low numbers are not an all-clear.','Puede subestimar mucho los impactos del huracán. Valores bajos no significan ausencia de peligro.'),'model-limit'));
+    const hourly=el('a',say('Explore every hour on this page ↓','Ver cada hora en esta página ↓'));hourly.href='#hourlyForecast';hourly.onclick=()=>byId('hourlyDetails').open=true;model.append(hourly);
+    setText('comparisonNote',say('How to compare: NHC describes the storm and regional hazards; SMN gives the Jalisco regional forecast; Open-Meteo estimates one town over 24 hours. Differences in totals or wind speeds are not necessarily disagreement. Regional maxima are not predictions for every address. Relative words such as “today” refer to each bulletin’s issue date. Official excerpts retain their original language and units.','Cómo comparar: el NHC describe el ciclón y peligros regionales; el SMN pronostica para Jalisco; Open-Meteo estima una comunidad durante 24 horas. Las diferencias no necesariamente son desacuerdos. Los máximos regionales no son valores para cada domicilio. “Hoy” se refiere a la fecha del aviso. Los extractos conservan el idioma y unidades originales.'));
+  }
+
   function renderTheme(){
     const dark=document.documentElement.dataset.theme==='dark';
     const label=lang==='es'?(dark?'☀ Modo claro':'☾ Modo oscuro'):(dark?'☀ Light mode':'☾ Dark mode');
@@ -304,7 +343,7 @@
     byId('themeToggle').setAttribute('aria-label',lang==='es'?'Cambiar a '+(dark?'modo claro':'modo oscuro'):'Switch to '+(dark?'light':'dark')+' mode');
     document.querySelector('meta[name="theme-color"]').content=dark?'#08090b':'#f1f4f2';
   }
-  function renderAll(){renderQuestions();renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();}
+  function renderAll(){renderQuestions();renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();renderComparison();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
   document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
   document.querySelectorAll('[data-units]').forEach(button=>button.addEventListener('click',()=>{
@@ -312,15 +351,15 @@
     try{localStorage.setItem(unitsKey,units);}catch(_){}
     const query=new URLSearchParams(location.search);query.set('units',units);
     try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash);}catch(_){}
-    renderUnits();renderStorm();renderForecast();renderCommunities();renderBriefing();renderResearch();
+    renderUnits();renderStorm();renderForecast();renderCommunities();renderBriefing();renderResearch();renderComparison();
   }));
   byId('loadVideo').addEventListener('click',()=>{stopCameras();const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
   byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);shareUrl.searchParams.set('units',units);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
   byId('hourlyShortcut').addEventListener('click',()=>{byId('hourlyDetails').open=true;});
   byId('rainShortcut').addEventListener('click',()=>{mapView='rain';renderMapViews();});
-  byId('researchTown').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();renderForecast();});
-  byId('townSelect').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();renderForecast();});
+  byId('researchTown').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();renderComparison();renderForecast();});
+  byId('townSelect').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();renderComparison();renderForecast();});
   document.querySelectorAll('[data-map-view]').forEach(button=>button.addEventListener('click',()=>{mapView=button.dataset.mapView;renderMapViews();}));
   byId('themeToggle').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem('bahia-watch-theme',theme);}catch(_){}renderTheme();});
-  refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();renderBriefing();renderResearch();},60*1000);
+  refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();renderBriefing();renderResearch();renderComparison();},60*1000);
 })();
