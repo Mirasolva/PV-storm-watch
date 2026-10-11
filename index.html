@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.css?v=smnfix1">
+  <link rel="stylesheet" href="styles.css?v=readable1">
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script defer src="app.js?v=smnfix1"></script>
+  <script defer src="app.js?v=readable1"></script>
 </head>
 <body>
   <div class="shell">
@@ -39,7 +39,7 @@
         <div class="glance-grid">
           <article class="glance-card storm-glance"><span class="card-kicker" data-i18n="nowLabel">01 / THE STORM NOW</span><div class="storm-heading"><strong id="stormName">--</strong><span id="categoryText">--</span></div><p id="stormDistance">--</p><p id="stormLocation" hidden>--</p><small><span data-i18n="officialObservation">Official observation</span> · <span id="advisoryTime">--</span></small><a id="briefAdvisory" target="_blank" rel="noopener noreferrer" data-i18n="fullAdvisory">Read the full storm advisory ↗</a></article>
           <article class="glance-card concerns-glance"><span class="card-kicker" data-i18n="watchLabel">02 / WHAT TO WATCH</span><h2 data-i18n="watchHeading">Rain, surf & access</h2><p id="localConcerns">--</p><small data-i18n="concernsNote">Area vulnerabilities, not a confirmed local warning.</small><a href="#questions" data-i18n="understandRisk">Understand these risks ↓</a><br><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer" data-i18n="officialAlerts">Official alerts</a></article>
-          <article class="glance-card forecast-glance"><span class="card-kicker" data-i18n="nextLabel">03 / YOUR LOCAL OUTLOOK</span><h2 id="briefTown">--</h2><p id="briefWindow">--</p><p class="brief-rain" id="briefRain">--</p><p id="briefWind">--</p><a href="#hourlyForecast" id="hourlyShortcut" data-i18n="openHourly">See the hourly forecast ↓</a><small id="briefForecastStamp">--</small><a href="#track" id="rainShortcut" data-i18n="officialRain">See official rainfall outlook ↓</a><br><a href="#communities" data-i18n="compareTowns">Compare all communities ↓</a></article>
+          <article class="glance-card forecast-glance"><span class="card-kicker" data-i18n="nextLabel">03 / YOUR LOCAL OUTLOOK</span><h2 id="briefTown">--</h2><p id="briefWindow">--</p><p class="brief-rain" id="briefRain">--</p><p id="briefWind">--</p><a href="#hourlyForecast" id="hourlyShortcut" data-i18n="openHourly">See the hourly forecast ↓</a><details class="brief-extra"><summary data-i18n="readMore">Read more</summary><small id="briefForecastStamp">--</small><a href="#track" id="rainShortcut" data-i18n="officialRain">See official rainfall outlook ↓</a><br><a href="#communities" data-i18n="compareTowns">Compare all communities ↓</a></details><p class="brief-model-caution">Open-Meteo · <span data-i18n="notOfficial">Not an official warning</span></p></article>
         </div>
       </section>
 
@@ -48,7 +48,7 @@
         <p data-i18n="compareIntro">Read the forecasts here. Official coastal outlooks and your town’s hourly model cover different areas and periods.</p>
         <div id="timingStrip" class="timing-strip"></div>
         <div id="forecastCards" class="forecast-cards"></div>
-        <p id="comparisonNote" class="comparison-note"></p>
+        <details class="comparison-method"><summary data-i18n="researchMethods">What does this information mean?</summary><p id="comparisonNote" class="comparison-note"></p></details>
       </section>
       <div class="safety-banner" role="note"><span class="safety-symbol">!</span><p><strong data-i18n="safetyTitle">Important:</strong> <span data-i18n="safetyText">A hurricane center does not have to cross your location to cause dangerous rain, surf, floods, or landslides. Follow official alerts and evacuation orders.</span></p><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer"><span data-i18n="officialAlerts">Official alerts</span> &#8599;</a></div>
 

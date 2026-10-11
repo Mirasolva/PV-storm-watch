@@ -247,6 +247,7 @@
     const town=towns.find(x=>x.key===selectedTown),f=latest?.communities?.[selectedTown],s=latest?.storm;
     byId('briefAdvisory').href=safeUrl(s?.public_advisory)||'https://www.nhc.noaa.gov/';setText('briefWind',modelAvailable(f)?t('gustMax')+': '+measurement(f.max_gust24h_kmh,'speed')+' '+unitLabel('speed'):t('modelUnavailable'));setText('localConcerns',t(town.risk));setText('briefTown',t(town.name));
     setText('briefRain',modelAvailable(f)&&f.rain24h_mm!=null?measurement(f.rain24h_mm,'rain')+' '+unitLabel('rain')+' · '+t('rainBrief'):t('modelUnavailable'));
+    byId('briefRain').hidden=!modelAvailable(f);byId('briefWind').hidden=!modelAvailable(f);
     setText('briefWindow',rainWindowText(f));setText('briefForecastStamp',modelAvailable(f)?t('modelRetrieved')+': '+localTime(f.retrieved_at)+'. '+t('localModelNote'):t('localModelNote'));
     setText('stormDistance',s?.status==='active'?t('roughDistance')+' '+measurement(haversine(s.lat,s.lon,20.6067,-105.235),'distance')+' '+unitLabel('distance')+' '+t('fromPv')+'. '+t('movingBrief')+' '+direction(s.movement_degrees)+' · '+measurement(s.movement_kmh,'speed')+' '+unitLabel('speed')+'.':s?.status==='not_active'?t('noActiveBrief'):t('unavailable'));
   }
@@ -305,8 +306,8 @@
     const root=byId('questionList');const opened=new Set([...root.querySelectorAll('details[open]')].map(x=>x.dataset.question));root.replaceChildren();
     visitorQuestions[lang].forEach(([question,answer,target,label],index)=>{const details=document.createElement('details');details.className='research-detail';details.dataset.question=String(index);details.open=opened.has(String(index));const summary=document.createElement('summary');summary.textContent=question;const p=document.createElement('p');p.textContent=answer;const a=document.createElement('a');a.className='question-link';a.href='#'+target;a.textContent=label+' ↓';a.addEventListener('click',()=>{if(target==='hourlyForecast')byId('hourlyDetails').open=true;if(target==='track'){mapView=index===1?'wind':'cone';renderMapViews();}if(target==='research')document.querySelector('#research details').open=true;});details.append(summary,p,a);root.append(details);});
   }
-  Object.assign(T.en,{compareNav:'Forecasts',compareKicker:'THE FORECAST / SOURCE BY SOURCE',compareTitle:'What to expect—and when',compareIntro:'Read the forecasts here. Official coastal outlooks and your town’s hourly model cover different areas and periods.'});
-  Object.assign(T.es,{compareNav:'Pronósticos',compareKicker:'EL PRONÓSTICO / FUENTE POR FUENTE',compareTitle:'Qué esperar y cuándo',compareIntro:'Lee los pronósticos aquí. Los avisos costeros oficiales y el modelo de tu comunidad abarcan zonas y periodos distintos.'});
+  Object.assign(T.en,{compareNav:'Forecasts',compareKicker:'THE FORECAST / SOURCE BY SOURCE',compareTitle:'What to expect—and when',compareIntro:'Official coastal forecasts alongside your local model.'});
+  Object.assign(T.es,{compareNav:'Pronósticos',compareKicker:'EL PRONÓSTICO / FUENTE POR FUENTE',compareTitle:'Qué esperar y cuándo',compareIntro:'Pronósticos costeros oficiales junto al modelo local.'});
   function renderComparison(){
     const es=lang==='es',say=(en,sp)=>es?sp:en,root=byId('forecastCards'),strip=byId('timingStrip');
     const opened=new Set([...root.querySelectorAll('details[open]')].map(x=>x.dataset.source));root.replaceChildren();strip.replaceChildren();
@@ -321,13 +322,13 @@
     const future=available?f.hourly.filter(h=>Date.parse(h.time)+3600000>Date.now()):[];
     const rain=future.filter(h=>h.rain_mm!=null).sort((a,b)=>b.rain_mm-a.rain_mm)[0];
     fact(say('Wettest modeled hour','Hora de mayor lluvia del modelo'),rain&&rain.rain_mm>0?localTime(rain.time)+' · '+measurement(rain.rain_mm,'rain')+' '+unitLabel('rain'):say('No reliable peak hour available','Sin hora máxima confiable'),say('Open-Meteo · Retrieved: ','Open-Meteo · Consultado: ')+localTime(f?.retrieved_at)+say(' · Other hours may tie.',' · Puede haber empates.'));
-    fact(say('When stronger winds begin','Cuándo comienza el viento fuerte'),nhc?.wind||say('Official wind timing unavailable here','Horario oficial del viento no disponible aquí'),say('NHC · Issued: ','NHC · Emitido: ')+localTime(nhc?.issued_at)+say(' · Regional, not a town-specific arrival time.',' · Regional, no una hora de llegada a tu comunidad.'));
+
     function card(name,scope,b,rows,key){
       const article=el('article',null,'source-forecast');article.append(el('span',scope,'source-scope'),el('h3',name));
       article.append(el('small',b?say('Issued: ','Emitido: ')+localTime(b.issued_at):say('Current bulletin unavailable · no forecast inferred','Aviso actual no disponible · no se infiere pronóstico')));
       if(b){article.append(el('p',b.language==='es'?say('Official excerpts · Original Spanish','Extractos oficiales · Español original'):say('Official excerpts · Original English','Extractos oficiales · Inglés original'),'original-language'));}
-      const list=el('dl');rows.forEach(([title,value])=>{const block=el('div');block.append(el('dt',title),el('dd',value||say('Not provided in this bulletin','No indicado en este aviso')));list.append(block);});article.append(list);
-      if(b){const details=el('details');details.dataset.source=key;details.open=opened.has(key);details.append(el('summary',say('Read more here','Leer más aquí')),el('p',b.details));if(b.warnings)details.append(el('p',b.warnings));article.append(details);const a=el('a',say('Original bulletin ↗','Aviso original ↗'));a.href=b.source;a.target='_blank';a.rel='noopener noreferrer';article.append(a);}root.append(article);return article;
+      const list=el('dl');rows.slice(0,2).forEach(([title,value])=>{const block=el('div');block.append(el('dt',title),el('dd',value||say('Not provided in this bulletin','No indicado en este aviso')));list.append(block);});article.append(list);
+      if(b){const details=el('details');details.dataset.source=key;details.open=opened.has(key);details.append(el('summary',say('Wind, coast & full forecast','Viento, costa y pronóstico completo')));rows.forEach(([title,value])=>{details.append(el('h4',title),el('p',value||'—'));});details.append(el('p',b.details));if(b.warnings)details.append(el('p',b.warnings));article.append(details);const a=el('a',say('Original bulletin ↗','Aviso original ↗'));a.href=b.source;a.target='_blank';a.rel='noopener noreferrer';details.append(a);}root.append(article);return article;
     }
     const labels=[say('Timing / track','Cuándo / trayectoria'),say('Rainfall','Lluvia'),say('Wind','Viento'),say('Coast / waves','Costa / oleaje')];
     card('NOAA / NHC',say('OFFICIAL · WEST-CENTRAL MEXICO','OFICIAL · COSTA CENTRO-OCCIDENTAL'),nhc,labels.map((x,i)=>[x,nhc?nhc[['timing','rain','wind','coast'][i]]:say('Awaiting a verified current bulletin','Esperando un aviso actual verificado')]),'nhc');
