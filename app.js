@@ -273,7 +273,14 @@
     byId('hourlyUnavailable').hidden=available;document.querySelector('.hourly-scroll').hidden=!available;const body=byId('hourlyRows');body.replaceChildren();
     if(available)f.hourly.forEach(hour=>{const row=document.createElement('tr');[localTime(hour.time),measurement(hour.rain_mm,'rain')+' '+unitLabel('rain'),hour.rain_probability==null?'--':hour.rain_probability+'%',measurement(hour.wind_kmh,'speed')+' '+unitLabel('speed'),measurement(hour.gust_kmh,'speed')+' '+unitLabel('speed')].forEach((value,index)=>{const cell=document.createElement(index===0?'th':'td');if(index===0)cell.scope='row';cell.textContent=value;row.append(cell);});body.append(row);});
   }
-  function renderAll(){renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();}
+  function renderTheme(){
+    const dark=document.documentElement.dataset.theme==='dark';
+    const label=lang==='es'?(dark?'☀ Modo claro':'☾ Modo oscuro'):(dark?'☀ Light mode':'☾ Dark mode');
+    byId('themeToggle').textContent=label;byId('themeToggle').setAttribute('aria-pressed',String(dark));
+    byId('themeToggle').setAttribute('aria-label',lang==='es'?'Cambiar a '+(dark?'modo claro':'modo oscuro'):'Switch to '+(dark?'light':'dark')+' mode');
+    document.querySelector('meta[name="theme-color"]').content=dark?'#091e2b':'#f1f4f2';
+  }
+  function renderAll(){renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
   document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
   document.querySelectorAll('[data-units]').forEach(button=>button.addEventListener('click',()=>{
@@ -289,5 +296,6 @@
   byId('researchTown').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();});
   byId('townSelect').addEventListener('change',event=>{selectedTown=event.target.value;renderBriefing();renderResearch();});
   document.querySelectorAll('[data-map-view]').forEach(button=>button.addEventListener('click',()=>{mapView=button.dataset.mapView;renderMapViews();}));
+  byId('themeToggle').addEventListener('click',()=>{const theme=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=theme;try{localStorage.setItem('bahia-watch-theme',theme);}catch(_){}renderTheme();});
   refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();renderBriefing();renderResearch();},60*1000);
 })();

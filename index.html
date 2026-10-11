@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#081c2a">
+  <meta name="theme-color" content="#f1f4f2">
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("bahia-watch-theme")==="dark"?"dark":"light";}catch(_){document.documentElement.dataset.theme="light";}</script>
   <meta name="description" content="Bahia Storm Watch: bilingual official hurricane track, local forecast estimates, and Banderas Bay webcam links.">
   <title>Bahia Storm Watch | Monitor de Tormentas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.css?v=research1">
+  <link rel="stylesheet" href="styles.css?v=theme1">
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script defer src="app.js?v=research1"></script>
+  <script defer src="app.js?v=theme1"></script>
 </head>
 <body>
   <div class="shell">
@@ -30,7 +31,7 @@
     </header>
 
     <main id="top">
-      <div class="unit-toolbar"><span id="unitsLabel">Units</span><div class="unit-switch" role="group" aria-labelledby="unitsLabel"><button type="button" data-units="metric" aria-pressed="true">Metric</button><button type="button" data-units="us" aria-pressed="false">US / Standard</button></div></div>
+      <div class="unit-toolbar"><button type="button" class="theme-toggle" id="themeToggle" aria-pressed="false">☾ Dark mode</button><span id="unitsLabel">Units</span><div class="unit-switch" role="group" aria-labelledby="unitsLabel"><button type="button" data-units="metric" aria-pressed="true">Metric</button><button type="button" data-units="us" aria-pressed="false">US / Standard</button></div></div>
       <div class="notice-rail"><span class="notice-pulse"></span><span id="freshLabel">CHECKING OFFICIAL DATA</span><span class="notice-separator"></span><span id="lastUpdated">--</span><a id="topNHCLink" href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer"><span data-i18n="nhcLink">NHC advisory</span> <span aria-hidden="true">&#8599;</span></a></div>
       <p id="dataWarning" class="data-warning" role="status" hidden></p>
       <section class="briefing" aria-labelledby="briefTitle">
