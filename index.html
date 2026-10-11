@@ -10,9 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=units1">
   <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script defer src="app.js"></script>
+  <script defer src="app.js?v=units1"></script>
 </head>
 <body>
   <div class="shell">
@@ -30,6 +30,7 @@
     </header>
 
     <main id="top">
+      <div class="unit-toolbar"><span id="unitsLabel">Units</span><div class="unit-switch" role="group" aria-labelledby="unitsLabel"><button type="button" data-units="metric" aria-pressed="true">Metric</button><button type="button" data-units="us" aria-pressed="false">US / Standard</button></div></div>
       <div class="notice-rail"><span class="notice-pulse"></span><span id="freshLabel">CHECKING OFFICIAL DATA</span><span class="notice-separator"></span><span id="lastUpdated">--</span><a id="topNHCLink" href="https://www.nhc.noaa.gov/" target="_blank" rel="noopener noreferrer"><span data-i18n="nhcLink">NHC advisory</span> <span aria-hidden="true">&#8599;</span></a></div>
       <p id="dataWarning" class="data-warning" role="status" hidden></p>
       <section class="hero">
@@ -46,9 +47,9 @@
       <div class="safety-banner" role="note"><span class="safety-symbol">!</span><p><strong data-i18n="safetyTitle">Important:</strong> <span data-i18n="safetyText">A hurricane center does not have to cross your location to cause dangerous rain, surf, floods, or landslides. Follow official alerts and evacuation orders.</span></p><a href="https://proteccioncivil.jalisco.gob.mx/" target="_blank" rel="noopener noreferrer"><span data-i18n="officialAlerts">Official alerts</span> &#8599;</a></div>
 
       <section class="metrics" aria-label="Current storm facts">
-        <article class="metric"><div class="metric-top"><span data-i18n="metricMove">MOVING</span><span class="metric-icon">&#8599;</span></div><div class="metric-value"><strong id="metricSpeed">--</strong><span data-i18n="kmh">km/h</span></div><p id="metricDirection">--</p></article>
-        <article class="metric"><div class="metric-top"><span data-i18n="metricWind">CORE WINDS</span><span class="metric-icon">~</span></div><div class="metric-value"><strong id="metricWindValue">--</strong><span>km/h</span></div><p data-i18n="coreWarning">At storm center, not your town</p></article>
-        <article class="metric"><div class="metric-top"><span data-i18n="metricPressure">PRESSURE</span><span class="metric-icon">&#9678;</span></div><div class="metric-value"><strong id="metricPressureValue">--</strong><span>mb</span></div><p data-i18n="centralPressure">Minimum central pressure</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricMove">MOVING</span><span class="metric-icon">&#8599;</span></div><div class="metric-value"><strong id="metricSpeed">--</strong><span data-unit-label="speed">km/h</span></div><p id="metricDirection">--</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricWind">CORE WINDS</span><span class="metric-icon">~</span></div><div class="metric-value"><strong id="metricWindValue">--</strong><span data-unit-label="speed">km/h</span></div><p data-i18n="coreWarning">At storm center, not your town</p></article>
+        <article class="metric"><div class="metric-top"><span data-i18n="metricPressure">PRESSURE</span><span class="metric-icon">&#9678;</span></div><div class="metric-value"><strong id="metricPressureValue">--</strong><span data-unit-label="pressure">mb</span></div><p data-i18n="centralPressure">Minimum central pressure</p></article>
         <article class="metric"><div class="metric-top"><span data-i18n="metricCoordinates">CURRENT CENTER</span><span class="metric-icon">+</span></div><div class="metric-value metric-coordinates"><strong id="metricCoordinatesValue">--</strong></div><p data-i18n="coordinatesNote">Official center coordinates</p></article>
       </section>
 

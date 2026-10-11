@@ -123,6 +123,23 @@
   try { savedLanguage=localStorage.getItem(localeKey)||'en'; } catch (_) {}
   const requestedLanguage=new URLSearchParams(location.search).get('lang');
   let lang=['en','es'].includes(requestedLanguage)?requestedLanguage:(savedLanguage==='es'?'es':'en');
+  const unitsKey='bahia-watch-units';
+  let units='metric';
+  try { units=localStorage.getItem(unitsKey)==='us'?'us':'metric'; } catch (_) {}
+  const requestedUnits=new URLSearchParams(location.search).get('units');
+  if(['metric','us'].includes(requestedUnits))units=requestedUnits;
+  function unitLabel(kind){return ({speed:units==='us'?'mph':'km/h',rain:units==='us'?'in':'mm',pressure:units==='us'?'inHg':'mb',distance:units==='us'?'mi':'km'})[kind];}
+  function measurement(value,kind){
+    if(value==null||value===''||!Number.isFinite(Number(value)))return '--';
+    const converted=Number(value)*(units==='us'?({speed:1/1.609344,rain:1/25.4,pressure:1/33.8638866667,distance:1/1.609344})[kind]:1);
+    const digits=kind==='distance'?0:kind==='pressure'?(units==='us'?2:0):kind==='rain'?(units==='us'?2:1):1;
+    return new Intl.NumberFormat(lang==='es'?'es-MX':'en-US',{maximumFractionDigits:digits}).format(converted);
+  }
+  function renderUnits(){
+    setText('unitsLabel',lang==='es'?'Unidades':'Units');
+    document.querySelectorAll('[data-units]').forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.units===units));button.textContent=button.dataset.units==='metric'?(lang==='es'?'Métrico':'Metric'):(lang==='es'?'EE. UU. / Estándar':'US / Standard');});
+    document.querySelectorAll('[data-unit-label]').forEach(node=>node.textContent=unitLabel(node.dataset.unitLabel));
+  }
   let latest=null, map=null, mapLayers=[], refreshFailed=false;
   const byId=id=>document.getElementById(id);
   const t=key=>(T[lang][key]||T.en[key]||key);
@@ -136,17 +153,17 @@
   function refreshStaticText(){document.documentElement.lang=lang;byId('shareButton').setAttribute('aria-label',t('share'));byId('loadVideo').setAttribute('aria-label',t('clickToLoad')); document.querySelectorAll('[data-i18n]').forEach(node=>node.textContent=t(node.dataset.i18n));document.querySelectorAll('.lang-switch button').forEach(btn=>btn.setAttribute('aria-pressed',String(btn.dataset.lang===lang)));document.title=lang==='es'?'Bahia Storm Watch | Monitor de Huracanes':'Bahia Storm Watch | Hurricane Tracker';renderAll();}
   function updateFreshness(){const strip=document.querySelector('.notice-rail');strip.classList.remove('stale');if(!latest){setText('freshLabel',t('unavailable'));setText('lastUpdated','--');return;}const demo=latest.mode!=='live';const age=(Date.now()-new Date(latest.checked_at).getTime())/3600000;const advisoryAge=latest.storm&&latest.storm.last_update?(Date.now()-new Date(latest.storm.last_update).getTime())/3600000:0;const nhcUnavailable=!latest.storm || (latest.errors||[]).some(x=>String(x).includes('NHC source unavailable'));const old=!Number.isFinite(age)||age < -0.25||age>1.5||!Number.isFinite(advisoryAge)||advisoryAge < -0.25||advisoryAge>6||nhcUnavailable||refreshFailed;if(demo||old)strip.classList.add('stale');setText('freshLabel',demo?t('sample'):old?t('stale'):t('live'));setText('lastUpdated',t('lastChecked')+': '+localTime(latest.checked_at)+' · '+t('timeLocal'));const problem=demo?t('demoWarning'):old?t('warningOld'):(latest.errors||[]).length?t('partialData'):'';setText('dataWarning',problem);byId('dataWarning').hidden=!problem;}
   function renderStorm(){const s=latest&&latest.storm;updateFreshness();const valid=s&&s.status==='active';setText('stormName',s&&s.name?String(s.name).toUpperCase():'SIMON');setText('categoryText',valid?stormCategory(s):(!s?t('unavailable'):t('noStorm')));setText('stormLocation',valid?`${Number(s.lat).toFixed(1)}\u00b0 N  /  ${Math.abs(Number(s.lon)).toFixed(1)}\u00b0 W` : t('noCenter'));
-    setText('advisoryTime',valid?localTime(s.last_update):'--');setText('metricSpeed',valid?s.movement_kmh:'--');setText('metricDirection',valid?direction(s.movement_degrees):'--');setText('metricWindValue',valid?s.winds_kmh:'--');setText('metricPressureValue',valid?s.pressure_mb:'--');setText('metricCoordinatesValue',valid?`${Number(s.lat).toFixed(1)} N, ${Math.abs(Number(s.lon)).toFixed(1)} W`:'--');
+    setText('advisoryTime',valid?localTime(s.last_update):'--');setText('metricSpeed',valid?measurement(s.movement_kmh,'speed'):'--');setText('metricDirection',valid?direction(s.movement_degrees):'--');setText('metricWindValue',valid?measurement(s.winds_kmh,'speed'):'--');setText('metricPressureValue',valid?measurement(s.pressure_mb,'pressure'):'--');setText('metricCoordinatesValue',valid?`${Number(s.lat).toFixed(1)} N, ${Math.abs(Number(s.lon)).toFixed(1)} W`:'--');
     const adv=safeUrl(s&&s.public_advisory);const forecast=safeUrl(s&&s.forecast_advisory);byId('topNHCLink').href=adv||'https://www.nhc.noaa.gov/';byId('forecastSourceLink').href=forecast||'https://www.nhc.noaa.gov/';byId('officialMapLink').href=safeUrl(s&&s.forecast_graphics)||'https://www.nhc.noaa.gov/';
   }
   function forecastPoints(s){return s&&s.status==='active'&&Array.isArray(s.forecast)?s.forecast.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Math.abs(p.lat)<=90&&Math.abs(p.lon)<=180&&Date.parse(p.time)>Date.now()):[];}
   function renderForecast(){const s=latest&&latest.storm, points=forecastPoints(s);if(!points.length){setText('forecastExplanation',s&&s.status==='not_active'?t('inactiveExplanation'):t('forecastNone'));return;}
     const target=towns[0], closest=points.slice().sort((a,b)=>haversine(a.lat,a.lon,target.lat,target.lon)-haversine(b.lat,b.lon,target.lat,target.lon))[0];
     const dist=Math.round(haversine(closest.lat,closest.lon,target.lat,target.lon));
-    setText('forecastExplanation',`${t('closest')} ${t('roughDistance')} ${dist} km (${localTime(closest.time)}). ${t('forecastCaution')} ${t('forecastIssued')}: ${localTime(s.forecast_issued)}.`);
+    setText('forecastExplanation',`${t('closest')} ${t('roughDistance')} ${measurement(dist,'distance')} ${unitLabel('distance')} (${localTime(closest.time)}). ${t('forecastCaution')} ${t('forecastIssued')}: ${localTime(s.forecast_issued)}.`);
   }
   function renderCommunities(){const node=byId('communityGrid');node.innerHTML='';towns.forEach(item=>{const forecast=latest&&latest.communities&&latest.communities[item.key];const modelAge=forecast?(Date.now()-Date.parse(forecast.retrieved_at))/3600000:Infinity;const available=forecast&&Array.isArray(forecast.hourly)&&forecast.hourly.length===24&&Number.isFinite(modelAge)&&modelAge>=-0.25&&modelAge<=1.5&&Date.parse(forecast.period_end)>Date.now();
-    const rain=available&&forecast.rain24h_mm!=null?`${forecast.rain24h_mm} mm`:'--';const wind=available&&forecast.max_wind24h_kmh!=null?`${forecast.max_wind24h_kmh} km/h`:'--';const onset=available?(forecast.rain_window?`${t('rainStart')} ${localTime(new Date(Math.floor(Date.parse(forecast.rain_window)/(3*3600000))*3*3600000).toISOString())} – ${localTime(new Date((Math.floor(Date.parse(forecast.rain_window)/(3*3600000))+1)*3*3600000).toISOString())}`:t('rainUnknown')):t('waiting');
+    const rain=available&&forecast.rain24h_mm!=null?`${measurement(forecast.rain24h_mm,'rain')} ${unitLabel('rain')}`:'--';const wind=available&&forecast.max_wind24h_kmh!=null?`${measurement(forecast.max_wind24h_kmh,'speed')} ${unitLabel('speed')}`:'--';const onset=available?(forecast.rain_window?`${t('rainStart')} ${localTime(new Date(Math.floor(Date.parse(forecast.rain_window)/(3*3600000))*3*3600000).toISOString())} – ${localTime(new Date((Math.floor(Date.parse(forecast.rain_window)/(3*3600000))+1)*3*3600000).toISOString())}`:t('rainUnknown')):t('waiting');
     const card=document.createElement('article');card.className='community-card';
     const top=document.createElement('div');top.className='card-eyebrow';top.innerHTML=`<span>${t('modelForecast')}</span><span>${item.number} / 05</span>`;
     const heading=document.createElement('h3');heading.textContent=t(item.name);
@@ -154,7 +171,7 @@
     const facts=document.createElement('div');facts.className='local-numbers';const rainFact=document.createElement('div'),windFact=document.createElement('div');
     let label=document.createElement('small');label.textContent=t('rain24');let val=document.createElement('strong');val.textContent=rain;rainFact.append(label,val);
     label=document.createElement('small');label.textContent=t('windMax');val=document.createElement('strong');val.textContent=wind;windFact.append(label,val);facts.append(rainFact,windFact);
-    for(const [key,value,unit] of [['gustMax',forecast&&forecast.max_gust24h_kmh,' km/h'],['rainChance',forecast&&forecast.max_rain_probability,'%']]){const fact=document.createElement('div');const l=document.createElement('small');l.textContent=t(key);const v=document.createElement('strong');v.textContent=available&&value!=null?value+unit:'--';fact.append(l,v);facts.append(fact);}
+    for(const [key,value,unit] of [['gustMax',forecast&&forecast.max_gust24h_kmh,' km/h'],['rainChance',forecast&&forecast.max_rain_probability,'%']]){const fact=document.createElement('div');const l=document.createElement('small');l.textContent=t(key);const v=document.createElement('strong');v.textContent=available&&value!=null?(key==='gustMax'?measurement(value,'speed')+' '+unitLabel('speed'):value+unit):'--';fact.append(l,v);facts.append(fact);}
     const foot=document.createElement('p');foot.className='rain-start';foot.textContent=onset;
     const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');card.append(top,heading,risk,facts,foot,stamp);node.append(card);
   });}
@@ -170,10 +187,17 @@
     cameras.forEach(c=>{const m=L.marker([c.lat,c.lon],{icon:L.divIcon({className:'cam-map-icon',html:'&#128247;',iconSize:[27,27],iconAnchor:[13,13]})});const wrapper=document.createElement('div');const label=document.createElement('strong');label.textContent=c.name;const link=document.createElement('a');link.href=c.link;link.target='_blank';link.rel='noopener noreferrer';link.textContent=t('viewCamera')+' \u2197';wrapper.append(label,document.createElement('br'),link);m.bindPopup(wrapper);m.addTo(map);mapLayers.push(m);});
     if(positions.length){map.fitBounds(L.latLngBounds(positions).pad(.19),{maxZoom:9,animate:false});}setTimeout(()=>map.invalidateSize(),90);
   }catch(e){byId('mapFallback').hidden=false;console.warn('Map failed:',e);}}
-  function renderAll(){renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();}
+  function renderAll(){renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
   document.querySelectorAll('.lang-switch button').forEach(btn=>btn.addEventListener('click',()=>{lang=btn.dataset.lang;try{localStorage.setItem(localeKey,lang);}catch(_){}const query=new URLSearchParams(location.search);query.set('lang',lang);try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash)}catch(_){/* local preview */}refreshStaticText();}));
+  document.querySelectorAll('[data-units]').forEach(button=>button.addEventListener('click',()=>{
+    units=button.dataset.units;
+    try{localStorage.setItem(unitsKey,units);}catch(_){}
+    const query=new URLSearchParams(location.search);query.set('units',units);
+    try{history.replaceState(null,'',location.pathname+'?'+query.toString()+location.hash);}catch(_){}
+    renderUnits();renderStorm();renderForecast();renderCommunities();
+  }));
   byId('loadVideo').addEventListener('click',()=>{const c=byId('embedContainer');const frame=document.createElement('iframe');frame.src='https://www.youtube-nocookie.com/embed/ac5AU4B10ak?autoplay=1&rel=0';frame.title='El Dorado Los Muertos Pier Cam';frame.loading='lazy';frame.allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share';frame.allowFullscreen=true;c.appendChild(frame);c.hidden=false;byId('videoPoster').hidden=true;});
-  byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
+  byId('shareButton').addEventListener('click',async()=>{const shareUrl=new URL(location.href);shareUrl.hash='';shareUrl.searchParams.set('lang',lang);shareUrl.searchParams.set('units',units);const u=shareUrl.href;const message=t('shareMessage')+' '+u;if(navigator.share){try{await navigator.share({title:t('sharing'),text:message,url:u});return;}catch(_){}}try{await navigator.clipboard.writeText(message);toast(t('copied'));}catch(_){toast(u);}});
   refreshStaticText();loadData();setInterval(()=>loadData(),5*60*1000);setInterval(()=>{updateFreshness();renderCommunities();renderForecast();},60*1000);
 })();
