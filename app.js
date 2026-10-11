@@ -302,7 +302,7 @@
     const label=lang==='es'?(dark?'☀ Modo claro':'☾ Modo oscuro'):(dark?'☀ Light mode':'☾ Dark mode');
     byId('themeToggle').textContent=label;byId('themeToggle').setAttribute('aria-pressed',String(dark));
     byId('themeToggle').setAttribute('aria-label',lang==='es'?'Cambiar a '+(dark?'modo claro':'modo oscuro'):'Switch to '+(dark?'light':'dark')+' mode');
-    document.querySelector('meta[name="theme-color"]').content=dark?'#091e2b':'#f1f4f2';
+    document.querySelector('meta[name="theme-color"]').content=dark?'#08090b':'#f1f4f2';
   }
   function renderAll(){renderQuestions();renderTheme();renderUnits();renderStorm();renderForecast();renderCommunities();renderCameras();renderMap();renderBriefing();renderMapViews();renderResearch();}
   async function loadData(){try{const r=await fetch('data/latest.json?cache='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);const j=await r.json();if(!j||j.schema_version!==1)throw new Error('Bad schema');latest=j;refreshFailed=false;renderAll();}catch(e){console.error('Data fetch failed:',e);refreshFailed=true;renderAll();setText('dataWarning',t('refreshError'));byId('dataWarning').hidden=false;}}
