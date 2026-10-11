@@ -76,11 +76,30 @@ def parse_smn(raw):
 SMN_MAP_URL='https://smn.conagua.gob.mx/tools/GUI/PortalLaravel/public/WebAviso'
 def parse_smn_track(raw,storm_name):
     text=clean(plain(raw))
-    identity=re.search(r'Sistema ciclónico:\s*([\wÁÉÍÓÚáéíóú]+)',text)
-    if not identity or identity.group(1).casefold()!=storm_name.casefold():raise ValueError('Different storm on SMN map page')
+    identity=re.search(r'Sistema ciclónico:\s*(.*?)\s+Emisión:',text)
+    if not identity or not re.fullmatch(r'(?:(?:Huracán|Tormenta tropical|Depresión tropical|Ciclón post-tropical)\s+)?'+re.escape(storm_name),identity.group(1),re.I):raise ValueError('Different storm on SMN map page')
     stamp=re.search(r'Emisión:\s*(\d{4}-\d{2}-\d{2} \d{2}:\d{2}) horas',text)
     if not stamp:raise ValueError('Missing map issue time')
     issued=datetime.strptime(stamp.group(1),'%Y-%m-%d %H:%M').replace(tzinfo=ZoneInfo('America/Mexico_City'));current(issued,9)
     image=re.search(r'''src=["']\./WebImg/(ImgTray\d+\.(?:jpg|png))["']''',raw)
     if not image:raise ValueError('Missing official track image')
-    return {'url':SMN_MAP_URL.rsplit('/',1)[0]+'/WebImg/'+image.group(1),'issued_at':issued.isoformat(),'storm':identity.group(1)}
+    return {'url':SMN_MAP_URL.rsplit('/',1)[0]+'/WebImg/'+image.group(1),'issued_at':issued.isoformat(),'storm':storm_name}
+
+class StormLinks(HTMLParser):
+    def __init__(self):
+        super().__init__();self.items=[];self.active=None;self.label=[]
+    def handle_starttag(self,tag,attrs):
+        data=dict(attrs)
+        if data.get('data-aviso-id','').isdigit():self.active=data['data-aviso-id'];self.label=[]
+    def handle_data(self,text):
+        if self.active:self.label.append(text)
+    def handle_endtag(self,tag):
+        if tag=='a' and self.active:
+            self.items.append((self.active,clean(' '.join(self.label))));self.active=None
+
+def smn_storm_url(raw,storm_name):
+    parser=StormLinks();parser.feed(raw)
+    for identity,label in parser.items:
+        if re.search(r'\b'+re.escape(storm_name)+r'\b',label,re.I):
+            return SMN_MAP_URL+'?searchText='+identity
+    return None

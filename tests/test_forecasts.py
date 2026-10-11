@@ -39,3 +39,13 @@ class MapIdentity(unittest.TestCase):
         self.assertIn('ImgTray123.jpg',parse_smn_track(raw,'Simon')['url'])
         for text in [raw.replace('Simon','Rachel'),raw.replace('Emisión:','Date:'),raw.replace('./WebImg/','https://other.example/')]:
             with self.assertRaises(ValueError):parse_smn_track(text,'Simon')
+
+class StormSelection(unittest.TestCase):
+    @patch('scripts.forecasts.current')
+    def test_classified_name_and_explicit_selection(self,_):
+        from scripts.forecasts import parse_smn_track,smn_storm_url
+        raw='Sistema ciclónico: Huracán Simon Emisión: 2026-10-11 12:00 horas <img src="./WebImg/ImgTray123.jpg">'
+        self.assertEqual(parse_smn_track(raw,'Simon')['storm'],'Simon')
+        links='<a data-aviso-id="11052">Rachel 90</a><a data-aviso-id="11054"><span>Huracán Simon</span> 34</a>'
+        self.assertTrue(smn_storm_url(links,'Simon').endswith('searchText=11054'))
+        self.assertIsNone(smn_storm_url(links,'Other'))
