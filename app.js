@@ -180,6 +180,7 @@
     const stamp=document.createElement('p');stamp.className='forecast-stamp';stamp.textContent=available?`${t('modelRetrieved')}: ${localTime(forecast.retrieved_at)}. ${t('forecastPeriod')}: ${localTime(forecast.period_start)} – ${localTime(forecast.period_end)}. ${t('timeLocal')}.`:t('modelUnavailable');const compactRain=document.createElement('strong');compactRain.className='compact-rain';compactRain.textContent=rain;const rainLabel=document.createElement('small');rainLabel.textContent=t('rainModelLabel');compactRain.append(rainLabel);summary.append(heading,risk,compactRain);card.append(summary,top,facts,foot,stamp);node.append(card);
   });}
   function stopCameras(){
+    document.querySelectorAll('.camera-placeholder').forEach(node=>node.hidden=false);
     document.querySelectorAll('.camera-player').forEach(node=>{node.replaceChildren();node.hidden=true;});
     document.querySelectorAll('.camera-watch').forEach(button=>{button.textContent='▶ '+t('watchHere');button.setAttribute('aria-expanded','false');button.setAttribute('aria-label',t('watchHere')+': '+button.dataset.cameraName);});
     byId('embedContainer').replaceChildren();byId('embedContainer').hidden=true;byId('videoPoster').hidden=false;
@@ -190,7 +191,7 @@
     cameraLanguage=lang;
     const node=byId('cameraGrid');node.replaceChildren();
     cameraItems.forEach((item,index)=>{
-      const card=document.createElement('article');card.className='camera-card';
+      const card=document.createElement('article');card.className='featured-video camera-row';
       const top=document.createElement('div');top.className='topline';top.textContent=t('cameraDirect');
       const title=document.createElement('h3');title.textContent=item.name;
       const credit=document.createElement('p');credit.textContent=t('cameraCredit')+': '+item.credit;
@@ -201,7 +202,14 @@
         const frame=document.createElement('iframe');frame.src=item.embed;frame.title=item.name;frame.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';frame.allowFullscreen=true;frame.referrerPolicy='strict-origin-when-cross-origin';
         player.append(frame);player.hidden=false;button.textContent=t('closeCamera');button.setAttribute('aria-expanded','true');button.setAttribute('aria-label',t('closeCamera')+': '+item.name);
       });
-      card.append(top,title,credit,button,player);node.append(card);
+      const panel=document.createElement('div');panel.className='video-panel';
+      const poster=document.createElement('div');poster.className='video-poster camera-placeholder';
+      const place=document.createElement('span');place.className='video-place';place.textContent=item.name;
+      const play=document.createElement('button');play.type='button';play.className='video-play';play.textContent='▶';play.setAttribute('aria-label',t('watchHere')+': '+item.name);play.addEventListener('click',()=>button.click());
+      const caption=document.createElement('div');caption.className='video-caption';caption.textContent=t('watchHere');poster.append(place,play,caption);
+      panel.append(poster,player);const copy=document.createElement('div');copy.className='featured-copy';copy.append(top,title,credit,button);
+      button.addEventListener('click',()=>{poster.hidden=!player.hidden;});
+      card.append(panel,copy);node.append(card);
     });
     const note=document.createElement('p');note.className='camera-help';note.textContent=t('cameraHelp');node.append(note);
   }
