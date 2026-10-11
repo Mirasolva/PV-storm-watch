@@ -102,7 +102,7 @@ def graphic_image_url(html, storm_id, kind='cone'):
     identity=storm_id.upper()
     if not re.fullmatch(r'(?:EP|AL|CP)\d{6}',identity):return None
     prefix='/storm_graphics/'+identity[:4]+'/'
-    token=identity+'_5day_cone' if kind=='cone' else identity[:2]+identity[4:]+'INTQPF'
+    token={'cone':identity+'_5day_cone','rain':identity[:2]+identity[4:]+'INTQPF','wind':identity+'_wind_probs_34_F120'}[kind]
     for value in re.findall(r'(?:src|href)\s*=\s*["\']([^"\']+)', html, re.I):
         url=urljoin('https://www.nhc.noaa.gov/',unescape(value))
         parsed=urlparse(url)
@@ -165,7 +165,7 @@ def get_storm():
         except (ValueError,urllib.error.URLError,TimeoutError) as e:
             storm['forecast_error']=type(e).__name__
     from urllib.parse import urlsplit, urlunsplit
-    for kind,query in [('cone','cone'),('rain','rainqpf')]:
+    for kind,query in [('cone','cone'),('rain','rainqpf'),('wind','tswind120')]:
         storm[kind+'_image_url']=None
         if storm['forecast_graphics']:
             try:

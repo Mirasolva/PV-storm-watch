@@ -23,6 +23,12 @@ class TestNHC(unittest.TestCase):
         self.assertIsNone(graphic_image_url(html,'ep202025','rain'))
         self.assertIsNone(graphic_image_url(html,'ep192026','rain'))
 
+    def test_wind_probability_graphic(self):
+        full='/storm_graphics/EP20/refresh/EP202026_wind_probs_34_F120+png/111452.png'
+        self.assertEqual(graphic_image_url(f'<img src="{full}">','ep202026','wind'),'https://www.nhc.noaa.gov'+full)
+        self.assertIsNone(graphic_image_url(f'<img src="{full}">','ep192026','wind'))
+        self.assertIsNone(graphic_image_url(f'<img src="{full.replace("34_F120","64_F120")}">','ep202026','wind'))
+
     def test_latlon(self):
         self.assertEqual(latlon('19.5N'),19.5)
         self.assertEqual(latlon('105.4W'),-105.4)
